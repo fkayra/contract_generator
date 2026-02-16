@@ -1,0 +1,7 @@
+INFO:     Started server process [224]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:56884 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49282 - "POST /generate-contract HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:42672 - "GET / HTTP/1.1" 200 OK
