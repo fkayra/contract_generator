@@ -1,8 +1,6 @@
 import { useState } from 'react'
-import axios from 'axios'
 import './App.css'
-
-const API_URL = 'http://localhost:8000'
+import { generateContract } from './contractGenerator'
 
 function App() {
   const [formData, setFormData] = useState({
@@ -87,28 +85,17 @@ function App() {
         team_buyout: formData.team_buyout && formData.team_buyout.amount ? {
           ...formData.team_buyout,
           amount: parseFloat(formData.team_buyout.amount)
-        } : undefined,
+        } : null,
         player_buyout: formData.player_buyout && formData.player_buyout.amount ? {
           ...formData.player_buyout,
           amount: parseFloat(formData.player_buyout.amount)
-        } : undefined,
+        } : null,
       }
 
-      const response = await axios.post(`${API_URL}/generate-contract`, payload, {
-        responseType: 'blob'
-      })
-
-      const url = window.URL.createObjectURL(new Blob([response.data]))
-      const link = document.createElement('a')
-      link.href = url
-      link.setAttribute('download', `contract_${formData.player_name.replace(/\s+/g, '_')}.docx`)
-      document.body.appendChild(link)
-      link.click()
-      link.remove()
-
+      await generateContract(payload)
       setSuccess('Contract generated successfully!')
     } catch (err) {
-      setError(err.response?.data?.detail || 'Failed to generate contract')
+      setError(err.message || 'Failed to generate contract')
     } finally {
       setLoading(false)
     }
