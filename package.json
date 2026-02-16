@@ -1,0 +1,13 @@
+{
+  "name": "contract-generator-api",
+  "private": true,
+  "scripts": {
+    "install:py": "pip install -r requirements.txt",
+    "install:frontend": "cd frontend && npm install",
+    "start": "python main.py",
+    "dev": "cd frontend && npm run dev",
+    "dev:api": "uvicorn main:app --reload",
+    "build": "cd frontend && npm run build",
+    "test": "python test_api.py"
+  }
+}
