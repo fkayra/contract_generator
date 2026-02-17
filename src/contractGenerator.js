@@ -12,6 +12,18 @@ export const generateContract = async (formData) => {
   content = content.replace(/\[CONTRACT DATE\]/g, formData.contractDate || '')
   content = content.replace(/\[NAME OF THE CLUB\]/g, formData.clubName || '')
   content = content.replace(/\[ADDRESS OF THE CLUB \]/g, formData.clubAddress || '')
+
+  if (formData.clubName) {
+    const clubNameEscaped = formData.clubName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    const boldRegex = new RegExp(`(<w:r(?:[^>]*)>)(?!<w:rPr>)(<w:t(?:[^>]*)>)(${clubNameEscaped})(</w:t>)`, 'g')
+    content = content.replace(boldRegex, '$1<w:rPr><w:b/></w:rPr>$2$3$4')
+  }
+
+  if (formData.clubAddress) {
+    const addressEscaped = formData.clubAddress.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    const addressRegex = new RegExp(`(<w:t(?:[^>]*)>)(${addressEscaped})(</w:t></w:r>)`, 'g')
+    content = content.replace(addressRegex, '$1$2$3</w:p><w:p>')
+  }
   content = content.replace(/\[NAME OF THE LEAGUES\]/g, formData.leaguesName || '')
   content = content.replace(/\[NAME OF THE PLAYER\]/g, formData.playerName || '')
   content = content.replace(/\[ADDRESS OF THE LEAGUES\]/g, formData.playerAddress || '')

@@ -4,7 +4,7 @@ import { generateContract } from './contractGenerator'
 
 function App() {
   const [formData, setFormData] = useState({
-    contractDate: new Date().toISOString().split('T')[0],
+    contractDate: '',
     clubName: '',
     clubAddress: '',
     leaguesName: '',
@@ -87,11 +87,12 @@ function App() {
               <div className="form-group">
                 <label>Contract Date *</label>
                 <input
-                  type="date"
+                  type="text"
                   name="contractDate"
                   value={formData.contractDate}
                   onChange={handleInputChange}
                   required
+                  placeholder="e.g., January 15, 2025"
                 />
               </div>
             </div>
