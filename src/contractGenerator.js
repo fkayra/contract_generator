@@ -24,7 +24,7 @@ export const generateContract = async (formData) => {
   content = content.replace(/\[ADDRESS OF THE CLUB \]/g, clubAddressReplacement)
   content = content.replace(/\[NAME OF THE LEAGUES\]/g, formData.leaguesName || '')
   content = content.replace(/\[NAME OF THE PLAYER\]/g, formData.playerName || '')
-  content = content.replace(/\[ADDRESS OF THE LEAGUES\]/g, formData.playerAddress || '')
+  content = content.replace(/\[ADDRESS OF THE PLAYER\]/g, formData.playerAddress || '')
   content = content.replace(/\[NUMBER OF SEASON\]/g, formData.numberOfSeasons || '')
   content = content.replace(/\[AND THE ADDITIONAL SEASON\]/g, formData.additionalSeason || '')
   content = content.replace(/\[SEASON\]/g, formData.season || '2025/26')
