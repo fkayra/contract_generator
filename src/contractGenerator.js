@@ -32,7 +32,6 @@ export const generateContract = async (formData) => {
   content = content.replace(/\[SEASON 2\]/g, formData.season2 || '2026/27')
   content = content.replace(/\[COUNNAME OF THE COUNTRY\]/g, formData.countryName || '')
   content = content.replace(/\[COUNNAME\]/g, formData.countryName || '')
-  content = content.replace(/\[COUNTRY OF THE PLAYER\]/g, formData.playerCountry || '')
   content = content.replace(/\[COUNTRY OF THE TEAM\]/g, formData.teamCountry || '')
   content = content.replace(/\[CURRENCY\]/g, formData.currency || '€')
   content = content.replace(/\[TOTAL AMOUNT OF CONTRACY\]/g, formData.totalSalary || '')

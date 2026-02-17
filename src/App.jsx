@@ -10,7 +10,6 @@ function App() {
     leaguesName: '',
     playerName: '',
     playerAddress: '',
-    playerCountry: '',
     teamCountry: '',
     countryName: '',
     numberOfSeasons: '1',
@@ -174,25 +173,14 @@ function App() {
                 />
               </div>
               <div className="form-group full-width">
-                <label>Player Address *</label>
+                <label>Address of the Leagues *</label>
                 <input
                   type="text"
                   name="playerAddress"
                   value={formData.playerAddress}
                   onChange={handleInputChange}
                   required
-                  placeholder="Address of the player"
-                />
-              </div>
-              <div className="form-group">
-                <label>Player Country *</label>
-                <input
-                  type="text"
-                  name="playerCountry"
-                  value={formData.playerCountry}
-                  onChange={handleInputChange}
-                  required
-                  placeholder="Country of the player"
+                  placeholder="Address of the leagues"
                 />
               </div>
             </div>
