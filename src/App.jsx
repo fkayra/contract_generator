@@ -173,14 +173,14 @@ function App() {
                 />
               </div>
               <div className="form-group full-width">
-                <label>Address of the Leagues *</label>
+                <label>Address of the Player *</label>
                 <input
                   type="text"
                   name="playerAddress"
                   value={formData.playerAddress}
                   onChange={handleInputChange}
                   required
-                  placeholder="Address of the leagues"
+                  placeholder="Address of the Player"
                 />
               </div>
             </div>
