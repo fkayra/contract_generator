@@ -31,7 +31,7 @@ export const generateContract = async (formData) => {
   content = content.replace(/\[DATE OF THE BUY OUT\]/g, formData.buyoutDate || '')
   content = content.replace(/\[NAME OF THE AGENT\]/g, formData.agentName || '')
   content = content.replace(/\[NUMBER OF THE AGENT\]/g, formData.agentName || '')
-  content = content.replace(/\[AND NAME OF THE OTHER AGENT\]/g, '')
+  content = content.replace(/\[AND NAME OF THE OTHER AGENT\]/g, formData.otherAgentName || '')
   content = content.replace(/\[EMAIL ADDRESS\]/g, formData.emailAddress || '')
   content = content.replace(/\[FIBA LICENCE NUMBER\]/g, formData.fibaLicence || '')
   content = content.replace(/\[TITLE OF SIGNEE\]/g, formData.signeeTitle || '')
