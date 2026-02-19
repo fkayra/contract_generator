@@ -51,8 +51,14 @@ export const generateContract = async (formData) => {
   const multiSeasonClause = isMultiSeason
     ? `(and will restart at the beginning of season ${formData.season2 || '2026/27'} to cease again 24 hours after the last official game of the Club for season ${formData.season2 || '2026/27'})`
     : ''
+
+  const multiSeasonClauseFull = isMultiSeason
+    ? ` ${multiSeasonClause} in which moment the Player will be a free agent and his letter of clearance will be issued if needed by the Club immediately upon request without any compensation payable to the Club.`
+    : '.'
+
   content = content.replace(/\[MULTI SEASON CLAUSE\]/g, multiSeasonClause)
   content = content.replace(/\{MULTI_SEASON_CLAUSE\}/g, multiSeasonClause)
+  content = content.replace(/\{MULTI_SEASON_CLAUSE_FULL\}/g, multiSeasonClauseFull)
 
   if (formData.paymentSchedule && formData.paymentSchedule.length > 0) {
     formData.paymentSchedule.forEach((payment, index) => {
