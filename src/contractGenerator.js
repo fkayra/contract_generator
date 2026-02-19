@@ -45,6 +45,13 @@ export const generateContract = async (formData) => {
   content = content.replace(/\[NOT\]/g, formData.notClause || '')
   content = content.replace(/\[ADDITIONAL SEASON\]/g, formData.additionalSeasonClause || '')
 
+  // Handle multi-season clause
+  const isMultiSeason = formData.numberOfSeasons === '2'
+  const multiSeasonClause = isMultiSeason
+    ? `(and will restart at the beginning of season ${formData.season2 || '2026/27'} to cease again 24 hours after the last official game of the Club for season ${formData.season2 || '2026/27'})`
+    : ''
+  content = content.replace(/\[MULTI SEASON CLAUSE\]/g, multiSeasonClause)
+
   if (formData.paymentSchedule && formData.paymentSchedule.length > 0) {
     formData.paymentSchedule.forEach((payment, index) => {
       const installmentNum = index + 1
