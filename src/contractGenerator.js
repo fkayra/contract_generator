@@ -19,6 +19,7 @@ export const generateContract = async (formData) => {
   content = content.replace(/\[AND THE ADDITIONAL SEASON\]/g, formData.additionalSeason || '')
   content = content.replace(/\[SEASON\]/g, formData.season || '2025/26')
   content = content.replace(/\[SEASON 1\]/g, formData.season1 || '2025/26')
+  content = content.replace(/\{SEASON_1\}/g, formData.season1 || '2025/26')
   content = content.replace(/\[SEASON 2\]/g, formData.season2 || '2026/27')
   content = content.replace(/\[COUNNAME OF THE COUNTRY\]/g, formData.countryName || '')
   content = content.replace(/\[COUNNAME\]/g, formData.countryName || '')
@@ -51,6 +52,7 @@ export const generateContract = async (formData) => {
     ? `(and will restart at the beginning of season ${formData.season2 || '2026/27'} to cease again 24 hours after the last official game of the Club for season ${formData.season2 || '2026/27'})`
     : ''
   content = content.replace(/\[MULTI SEASON CLAUSE\]/g, multiSeasonClause)
+  content = content.replace(/\{MULTI_SEASON_CLAUSE\}/g, multiSeasonClause)
 
   if (formData.paymentSchedule && formData.paymentSchedule.length > 0) {
     formData.paymentSchedule.forEach((payment, index) => {
