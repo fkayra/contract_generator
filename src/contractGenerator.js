@@ -53,8 +53,8 @@ export const generateContract = async (formData) => {
     : ''
 
   const multiSeasonClauseFull = isMultiSeason
-    ? ` ${multiSeasonClause} in which moment the Player will be a free agent and his letter of clearance will be issued if needed by the Club immediately upon request without any compensation payable to the Club.`
-    : '.'
+    ? ` ${multiSeasonClause} in which moment the Player will be a free agent and his letter of clearance will be issued if needed by the Club immediately upon request without any compensation payable to the Club`
+    : ''
 
   content = content.replace(/\[MULTI SEASON CLAUSE\]/g, multiSeasonClause)
   content = content.replace(/\{MULTI_SEASON_CLAUSE\}/g, multiSeasonClause)
