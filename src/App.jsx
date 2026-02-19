@@ -27,7 +27,6 @@ function App() {
     buyoutDate: '',
     agentName: '',
     otherAgentName: '',
-    agentNumber: '',
     emailAddress: '',
     fibaLicence: '',
     signeeTitle: '',
@@ -371,16 +370,6 @@ function App() {
                   value={formData.otherAgentName}
                   onChange={handleInputChange}
                   placeholder="And name of the other agent"
-                />
-              </div>
-              <div className="form-group">
-                <label>Agent Number</label>
-                <input
-                  type="text"
-                  name="agentNumber"
-                  value={formData.agentNumber}
-                  onChange={handleInputChange}
-                  placeholder="Number of the agent"
                 />
               </div>
               <div className="form-group">
