@@ -10,18 +10,8 @@ export const generateContract = async (formData) => {
   let content = zip.file('word/document.xml').asText()
 
   content = content.replace(/\[CONTRACT DATE\]/g, formData.contractDate || '')
-
-  // Club name'i bold yaparak ekle
-  const clubNameReplacement = formData.clubName
-    ? `<w:r><w:rPr><w:b/></w:rPr><w:t>${formData.clubName}</w:t></w:r>`
-    : ''
-  content = content.replace(/\[NAME OF THE CLUB\]/g, clubNameReplacement)
-
-  // Club address'den sonra boşluk ekle
-  const clubAddressReplacement = formData.clubAddress
-    ? `${formData.clubAddress}</w:t></w:r></w:p><w:p><w:r><w:t xml:space="preserve"> `
-    : ''
-  content = content.replace(/\[ADDRESS OF THE CLUB \]/g, clubAddressReplacement)
+  content = content.replace(/\[NAME OF THE CLUB\]/g, formData.clubName || '')
+  content = content.replace(/\[ADDRESS OF THE CLUB \]/g, formData.clubAddress || '')
   content = content.replace(/\[NAME OF THE LEAGUES\]/g, formData.leaguesName || '')
   content = content.replace(/\[NAME OF THE PLAYER\]/g, formData.playerName || '')
   content = content.replace(/\[ADDRESS OF THE LEAGUES\]/g, formData.playerAddress || '')
