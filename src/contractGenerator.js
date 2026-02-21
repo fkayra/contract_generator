@@ -61,11 +61,22 @@ export const generateContract = async (formData) => {
   content = content.replace(/\{MULTI_SEASON_CLAUSE_FULL\}/g, multiSeasonClauseFull)
 
   if (formData.paymentSchedule && formData.paymentSchedule.length > 0) {
+    const getOrdinalSuffix = (num) => {
+      if (num === 1) return 'ST'
+      if (num === 2) return 'ND'
+      if (num === 3) return 'RD'
+      return 'TH'
+    }
+
     formData.paymentSchedule.forEach((payment, index) => {
       const installmentNum = index + 1
-      content = content.replace(new RegExp(`\\[DATE OF ${installmentNum}`, 'g'), payment.date || '')
-      content = content.replace(new RegExp(`DATE OF ${installmentNum}`, 'g'), payment.date || '')
-      content = content.replace(/\[AMOUNT OF THAT MONTH\]/, payment.amount || '')
+      const suffix = getOrdinalSuffix(installmentNum)
+
+      content = content.replace(new RegExp(`\\[DATE OF ${installmentNum}${suffix} SALARY\\]`, 'g'), payment.date || '')
+      content = content.replace(new RegExp(`DATE OF ${installmentNum}${suffix} SALARY`, 'g'), payment.date || '')
+
+      content = content.replace(new RegExp(`\\[AMOUNT OF ${installmentNum}${suffix} SALARY\\]`, 'g'), payment.amount || '')
+      content = content.replace(new RegExp(`AMOUNT OF ${installmentNum}${suffix} SALARY`, 'g'), payment.amount || '')
     })
   }
 
