@@ -68,12 +68,16 @@ export const generateContract = async (formData) => {
       return 'TH'
     }
 
-    const replacePattern = (text, pattern, replacement) => {
-      const escapedPattern = pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-      const parts = escapedPattern.split(/\s+/)
-      const flexiblePattern = parts.join('(?:<[^>]*>|\\s)*')
-      const regex = new RegExp(flexiblePattern, 'g')
-      return text.replace(regex, replacement)
+    const createFlexibleRegex = (pattern) => {
+      const parts = pattern.split('').map(char => {
+        if (char === '[' || char === ']' || char === '(' || char === ')') {
+          return '\\' + char
+        }
+        return char
+      })
+
+      const flexible = parts.join('(?:<[^>]*>)*')
+      return new RegExp(flexible, 'g')
     }
 
     formData.paymentSchedule.forEach((payment, index) => {
@@ -81,14 +85,17 @@ export const generateContract = async (formData) => {
       const suffix = getOrdinalSuffix(installmentNum)
 
       if (installmentNum === 1) {
-        const datePattern1 = `[DATE OF ${installmentNum}${suffix} SALARY]`
-        content = replacePattern(content, datePattern1, payment.date || '')
+        const pattern = `[DATE OF ${installmentNum}${suffix} SALARY]`
+        const regex = createFlexibleRegex(pattern)
+        content = content.replace(regex, payment.date || '')
       } else {
-        const datePattern2 = `DATE OF ${installmentNum}${suffix} SALARY`
-        content = replacePattern(content, datePattern2, payment.date || '')
+        const pattern = `DATE OF ${installmentNum}${suffix} SALARY`
+        const regex = createFlexibleRegex(pattern)
+        content = content.replace(regex, payment.date || '')
       }
 
-      content = replacePattern(content, '[AMOUNT OF THAT MONTH]', payment.amount || '')
+      const amountRegex = createFlexibleRegex('[AMOUNT OF THAT MONTH]')
+      content = content.replace(amountRegex, payment.amount || '')
     })
   }
 
