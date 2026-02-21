@@ -2,7 +2,7 @@ import PizZip from 'pizzip'
 import { saveAs } from 'file-saver'
 
 export const generateContract = async (formData) => {
-  const response = await fetch('/src/assets/Team_Contract_2025_26_AI_(1)_(1).docx')
+  const response = await fetch('/template.docx')
   const arrayBuffer = await response.arrayBuffer()
 
   const zip = new PizZip(arrayBuffer)

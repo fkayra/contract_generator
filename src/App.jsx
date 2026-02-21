@@ -73,7 +73,7 @@ function App() {
 
   const handleDownloadTemplate = async () => {
     try {
-      const response = await fetch('/Team_Contract_Template.docx')
+      const response = await fetch('/template.docx')
       const blob = await response.blob()
       const url = window.URL.createObjectURL(blob)
       const link = document.createElement('a')
