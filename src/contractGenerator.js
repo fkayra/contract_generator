@@ -72,11 +72,13 @@ export const generateContract = async (formData) => {
       const installmentNum = index + 1
       const suffix = getOrdinalSuffix(installmentNum)
 
-      content = content.replace(new RegExp(`\\[DATE OF ${installmentNum}${suffix} SALARY\\]`, 'g'), payment.date || '')
-      content = content.replace(new RegExp(`DATE OF ${installmentNum}${suffix} SALARY`, 'g'), payment.date || '')
+      if (installmentNum === 1) {
+        content = content.replace(`[DATE OF ${installmentNum}${suffix} SALARY]`, payment.date || '')
+      } else {
+        content = content.replace(`DATE OF ${installmentNum}${suffix} SALARY`, payment.date || '')
+      }
 
-      content = content.replace(new RegExp(`\\[AMOUNT OF ${installmentNum}${suffix} SALARY\\]`, 'g'), payment.amount || '')
-      content = content.replace(new RegExp(`AMOUNT OF ${installmentNum}${suffix} SALARY`, 'g'), payment.amount || '')
+      content = content.replace('[AMOUNT OF THAT MONTH]', payment.amount || '')
     })
   }
 
