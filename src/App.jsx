@@ -71,12 +71,35 @@ function App() {
     }
   }
 
+  const handleDownloadTemplate = () => {
+    const link = document.createElement('a')
+    link.href = '/Team_Contract_Template.docx'
+    link.download = 'Team_Contract_Template.docx'
+    link.click()
+  }
+
   return (
     <div className="app">
       <div className="container">
         <header>
           <h1>Basketball Contract Generator</h1>
           <p>Fill in the contract details based on template</p>
+          <button
+            type="button"
+            onClick={handleDownloadTemplate}
+            className="btn-download"
+            style={{
+              marginTop: '10px',
+              padding: '8px 16px',
+              backgroundColor: '#4CAF50',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer'
+            }}
+          >
+            Download Template
+          </button>
         </header>
 
         <form onSubmit={handleSubmit}>
