@@ -79,12 +79,8 @@ export const generateContract = async (formData) => {
       }
     })
 
-    const placeholders = ['[COMPETITION]', '[ACHIEVEMENT]', '[AMOUNT OF THAT MONTH]']
-
-    placeholders.forEach(placeholder => {
-      const regex = new RegExp(placeholder.replace(/[[\]]/g, '\\$&'), 'g')
-      content = content.replace(regex, bonusText)
-    })
+    const competitionRegex = new RegExp('\\[COMPETITION\\]', 'g')
+    content = content.replace(competitionRegex, bonusText)
   }
 
   if (formData.paymentSchedule && formData.paymentSchedule.length > 0) {
