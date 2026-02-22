@@ -42,7 +42,7 @@ export const generateContract = async (formData) => {
   content = content.replace(/\[NUMBER OF BEDROOM\]/g, formData.numberOfBedrooms || '')
   content = content.replace(/\[NUMBER OF DAYS\]/g, formData.numberOfDays || '')
   content = content.replace(/\[ACHIEVEMENT\]/g, formData.achievement || '')
-  content = content.replace(/\[COMPETITION\]/g, formData.competition || '')
+  // [COMPETITION] will be replaced later with bonus XML
   content = content.replace(/\[NOT\]/g, formData.notClause || '')
   content = content.replace(/\[ADDITIONAL SEASON\]/g, formData.additionalSeasonClause || '')
 
