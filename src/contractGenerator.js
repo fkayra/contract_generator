@@ -83,8 +83,8 @@ export const generateContract = async (formData) => {
     })
 
     // Replace [COMPETITION] placeholder with generated XML
-    // Match the entire paragraph containing [COMPETITION], including any formatting tags
-    const competitionRegex = /<w:p\s+[^>]*>[\s\S]*?\[COMPETITION\][\s\S]*?<\/w:p>/g
+    // Match only the specific paragraph with paraId="0000004D" that contains [COMPETITION]
+    const competitionRegex = /<w:p\s+[^>]*w14:paraId="0000004D"[^>]*>[\s\S]*?<\/w:p>/g
     content = content.replace(competitionRegex, bonusXML)
   }
 
