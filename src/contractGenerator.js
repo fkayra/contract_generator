@@ -61,26 +61,49 @@ export const generateContract = async (formData) => {
   content = content.replace(/\{MULTI_SEASON_CLAUSE_FULL\}/g, multiSeasonClauseFull)
 
   if (formData.bonuses && formData.bonuses.length > 0) {
-    let bonusText = ''
+    let bonusXML = ''
 
     formData.bonuses.forEach((bonus, index) => {
       if (bonus.competitionName && bonus.achievements.some(a => a.description || a.amount)) {
-        bonusText += bonus.competitionName + '\n'
+        // Competition name paragraph (bold)
+        bonusXML += `<w:p w:rsidR="00000000" w:rsidDel="00000000" w:rsidP="00000000" w:rsidRDefault="00000000" w:rsidRPr="00000000" w14:paraId="00000000">
+          <w:pPr>
+            <w:pStyle w:val="Normal"/>
+          </w:pPr>
+          <w:r>
+            <w:rPr><w:b w:val="1"/><w:bCs w:val="1"/></w:rPr>
+            <w:t xml:space="preserve">${bonus.competitionName}</w:t>
+          </w:r>
+        </w:p>`
 
+        // Achievement paragraphs with bullets
         bonus.achievements.forEach(achievement => {
           if (achievement.description && achievement.amount) {
-            bonusText += '• ' + achievement.description + ' ' + achievement.amount + '\n'
+            bonusXML += `<w:p w:rsidR="00000000" w:rsidDel="00000000" w:rsidP="00000000" w:rsidRDefault="00000000" w:rsidRPr="00000000" w14:paraId="00000000">
+              <w:pPr>
+                <w:pStyle w:val="Normal"/>
+                <w:ind w:left="360" w:hanging="0"/>
+              </w:pPr>
+              <w:r>
+                <w:t xml:space="preserve">• ${achievement.description} ${achievement.amount}</w:t>
+              </w:r>
+            </w:p>`
           }
         })
 
+        // Empty line between competitions (except after last one)
         if (index < formData.bonuses.length - 1) {
-          bonusText += '\n'
+          bonusXML += `<w:p w:rsidR="00000000" w:rsidDel="00000000" w:rsidP="00000000" w:rsidRDefault="00000000" w:rsidRPr="00000000" w14:paraId="00000000">
+            <w:pPr><w:pStyle w:val="Normal"/></w:pPr>
+            <w:r><w:t></w:t></w:r>
+          </w:p>`
         }
       }
     })
 
-    const competitionRegex = new RegExp('\\[COMPETITION\\]', 'g')
-    content = content.replace(competitionRegex, bonusText)
+    // Replace [COMPETITION] placeholder with generated XML
+    const competitionRegex = /<w:p[^>]*>[\s\S]*?<w:t>\[COMPETITION\]<\/w:t>[\s\S]*?<\/w:p>/g
+    content = content.replace(competitionRegex, bonusXML)
   }
 
   if (formData.paymentSchedule && formData.paymentSchedule.length > 0) {
