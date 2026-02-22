@@ -66,43 +66,25 @@ export const generateContract = async (formData) => {
     formData.bonuses.forEach((bonus, index) => {
       if (bonus.competitionName && bonus.achievements.some(a => a.description || a.amount)) {
         // Competition name paragraph (bold)
-        bonusXML += `<w:p w:rsidR="00000000" w:rsidDel="00000000" w:rsidP="00000000" w:rsidRDefault="00000000" w:rsidRPr="00000000" w14:paraId="00000000">
-          <w:pPr>
-            <w:pStyle w:val="Normal"/>
-          </w:pPr>
-          <w:r>
-            <w:rPr><w:b w:val="1"/><w:bCs w:val="1"/></w:rPr>
-            <w:t xml:space="preserve">${bonus.competitionName}</w:t>
-          </w:r>
-        </w:p>`
+        bonusXML += `<w:p w:rsidR="00000000" w:rsidDel="00000000" w:rsidP="00000000" w:rsidRDefault="00000000" w:rsidRPr="00000000" w14:paraId="00000000"><w:pPr><w:pStyle w:val="Normal"/><w:tabs><w:tab w:val="left" w:leader="none" w:pos="567"/><w:tab w:val="left" w:leader="none" w:pos="1134"/><w:tab w:val="left" w:leader="none" w:pos="1701"/><w:tab w:val="left" w:leader="none" w:pos="2268"/><w:tab w:val="left" w:leader="none" w:pos="2835"/><w:tab w:val="left" w:leader="none" w:pos="3402"/><w:tab w:val="left" w:leader="none" w:pos="3969"/><w:tab w:val="left" w:leader="none" w:pos="4536"/><w:tab w:val="left" w:leader="none" w:pos="5103"/><w:tab w:val="left" w:leader="none" w:pos="5670"/><w:tab w:val="left" w:leader="none" w:pos="6237"/><w:tab w:val="left" w:leader="none" w:pos="6804"/><w:tab w:val="left" w:leader="none" w:pos="7371"/><w:tab w:val="left" w:leader="none" w:pos="7938"/><w:tab w:val="left" w:leader="none" w:pos="8505"/><w:tab w:val="left" w:leader="none" w:pos="9072"/><w:tab w:val="left" w:leader="none" w:pos="9639"/></w:tabs><w:ind w:firstLine="567"/><w:jc w:val="both"/><w:rPr><w:rtl w:val="0"/></w:rPr></w:pPr><w:r w:rsidDel="00000000" w:rsidR="00000000" w:rsidRPr="00000000"><w:rPr><w:b w:val="1"/><w:bCs w:val="1"/><w:rtl w:val="0"/></w:rPr><w:t xml:space="preserve">${bonus.competitionName}</w:t></w:r></w:p>`
 
         // Achievement paragraphs with bullets
         bonus.achievements.forEach(achievement => {
           if (achievement.description && achievement.amount) {
-            bonusXML += `<w:p w:rsidR="00000000" w:rsidDel="00000000" w:rsidP="00000000" w:rsidRDefault="00000000" w:rsidRPr="00000000" w14:paraId="00000000">
-              <w:pPr>
-                <w:pStyle w:val="Normal"/>
-                <w:ind w:left="360" w:hanging="0"/>
-              </w:pPr>
-              <w:r>
-                <w:t xml:space="preserve">• ${achievement.description} ${achievement.amount}</w:t>
-              </w:r>
-            </w:p>`
+            bonusXML += `<w:p w:rsidR="00000000" w:rsidDel="00000000" w:rsidP="00000000" w:rsidRDefault="00000000" w:rsidRPr="00000000" w14:paraId="00000000"><w:pPr><w:pStyle w:val="Normal"/><w:tabs><w:tab w:val="left" w:leader="none" w:pos="567"/><w:tab w:val="left" w:leader="none" w:pos="1134"/><w:tab w:val="left" w:leader="none" w:pos="1701"/><w:tab w:val="left" w:leader="none" w:pos="2268"/><w:tab w:val="left" w:leader="none" w:pos="2835"/><w:tab w:val="left" w:leader="none" w:pos="3402"/><w:tab w:val="left" w:leader="none" w:pos="3969"/><w:tab w:val="left" w:leader="none" w:pos="4536"/><w:tab w:val="left" w:leader="none" w:pos="5103"/><w:tab w:val="left" w:leader="none" w:pos="5670"/><w:tab w:val="left" w:leader="none" w:pos="6237"/><w:tab w:val="left" w:leader="none" w:pos="6804"/><w:tab w:val="left" w:leader="none" w:pos="7371"/><w:tab w:val="left" w:leader="none" w:pos="7938"/><w:tab w:val="left" w:leader="none" w:pos="8505"/><w:tab w:val="left" w:leader="none" w:pos="9072"/><w:tab w:val="left" w:leader="none" w:pos="9639"/></w:tabs><w:ind w:left="1134"/><w:jc w:val="both"/><w:rPr><w:rtl w:val="0"/></w:rPr></w:pPr><w:r w:rsidDel="00000000" w:rsidR="00000000" w:rsidRPr="00000000"><w:rPr><w:rtl w:val="0"/></w:rPr><w:t xml:space="preserve">• ${achievement.description}: ${achievement.amount}</w:t></w:r></w:p>`
           }
         })
 
         // Empty line between competitions (except after last one)
         if (index < formData.bonuses.length - 1) {
-          bonusXML += `<w:p w:rsidR="00000000" w:rsidDel="00000000" w:rsidP="00000000" w:rsidRDefault="00000000" w:rsidRPr="00000000" w14:paraId="00000000">
-            <w:pPr><w:pStyle w:val="Normal"/></w:pPr>
-            <w:r><w:t></w:t></w:r>
-          </w:p>`
+          bonusXML += `<w:p w:rsidR="00000000" w:rsidDel="00000000" w:rsidP="00000000" w:rsidRDefault="00000000" w:rsidRPr="00000000" w14:paraId="00000000"><w:pPr><w:pStyle w:val="Normal"/></w:pPr></w:p>`
         }
       }
     })
 
     // Replace [COMPETITION] placeholder with generated XML
-    const competitionRegex = /<w:p[^>]*>[\s\S]*?<w:t>\[COMPETITION\]<\/w:t>[\s\S]*?<\/w:p>/g
+    // Match the entire paragraph containing [COMPETITION], including any formatting tags
+    const competitionRegex = /<w:p\s+[^>]*>[\s\S]*?\[COMPETITION\][\s\S]*?<\/w:p>/g
     content = content.replace(competitionRegex, bonusXML)
   }
 
