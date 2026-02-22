@@ -65,11 +65,11 @@ export const generateContract = async (formData) => {
 
     formData.bonuses.forEach((bonus, index) => {
       if (bonus.competitionName && bonus.achievements.some(a => a.description || a.amount)) {
-        bonusText += `\n${bonus.competitionName}:\n`
+        bonusText += bonus.competitionName + '\n'
 
         bonus.achievements.forEach(achievement => {
-          if (achievement.description || achievement.amount) {
-            bonusText += `• ${achievement.description}: ${achievement.amount}\n`
+          if (achievement.description && achievement.amount) {
+            bonusText += '• ' + achievement.description + ' ' + achievement.amount + '\n'
           }
         })
 
@@ -79,22 +79,12 @@ export const generateContract = async (formData) => {
       }
     })
 
-    const createFlexibleRegex = (pattern) => {
-      const parts = pattern.split('').map(char => {
-        if (char === '[' || char === ']' || char === '(' || char === ')') {
-          return '\\' + char
-        }
-        return char
-      })
-      const flexible = parts.join('(?:<[^>]*>)*')
-      return new RegExp(flexible, 'g')
-    }
+    const placeholders = ['[COMPETITION]', '[ACHIEVEMENT]', '[AMOUNT OF THAT MONTH]']
 
-    const competitionRegex = createFlexibleRegex('[COMPETITION]')
-    const achievementRegex = createFlexibleRegex('[ACHIEVEMENT]')
-
-    content = content.replace(competitionRegex, bonusText)
-    content = content.replace(achievementRegex, '')
+    placeholders.forEach(placeholder => {
+      const regex = new RegExp(placeholder.replace(/[[\]]/g, '\\$&'), 'g')
+      content = content.replace(regex, bonusText)
+    })
   }
 
   if (formData.paymentSchedule && formData.paymentSchedule.length > 0) {
