@@ -35,9 +35,15 @@ function App() {
     numberOfTickets: '',
     numberOfBedrooms: '',
     numberOfDays: '',
-    achievement: '',
-    competition: '',
     notClause: '',
+    bonuses: [
+      {
+        competitionName: '',
+        achievements: [
+          { description: '', amount: '' }
+        ]
+      }
+    ],
   })
 
   const [loading, setLoading] = useState(false)
@@ -53,6 +59,46 @@ function App() {
     const newPayments = [...formData.paymentSchedule]
     newPayments[index][field] = value
     setFormData(prev => ({ ...prev, paymentSchedule: newPayments }))
+  }
+
+  const handleBonusCompetitionChange = (competitionIndex, value) => {
+    const newBonuses = [...formData.bonuses]
+    newBonuses[competitionIndex].competitionName = value
+    setFormData(prev => ({ ...prev, bonuses: newBonuses }))
+  }
+
+  const handleAchievementChange = (competitionIndex, achievementIndex, field, value) => {
+    const newBonuses = [...formData.bonuses]
+    newBonuses[competitionIndex].achievements[achievementIndex][field] = value
+    setFormData(prev => ({ ...prev, bonuses: newBonuses }))
+  }
+
+  const addAchievement = (competitionIndex) => {
+    const newBonuses = [...formData.bonuses]
+    newBonuses[competitionIndex].achievements.push({ description: '', amount: '' })
+    setFormData(prev => ({ ...prev, bonuses: newBonuses }))
+  }
+
+  const removeAchievement = (competitionIndex, achievementIndex) => {
+    const newBonuses = [...formData.bonuses]
+    if (newBonuses[competitionIndex].achievements.length > 1) {
+      newBonuses[competitionIndex].achievements.splice(achievementIndex, 1)
+      setFormData(prev => ({ ...prev, bonuses: newBonuses }))
+    }
+  }
+
+  const addCompetition = () => {
+    setFormData(prev => ({
+      ...prev,
+      bonuses: [...prev.bonuses, { competitionName: '', achievements: [{ description: '', amount: '' }] }]
+    }))
+  }
+
+  const removeCompetition = (competitionIndex) => {
+    if (formData.bonuses.length > 1) {
+      const newBonuses = formData.bonuses.filter((_, i) => i !== competitionIndex)
+      setFormData(prev => ({ ...prev, bonuses: newBonuses }))
+    }
   }
 
   const handleSubmit = async (e) => {
@@ -499,26 +545,6 @@ function App() {
                 />
               </div>
               <div className="form-group full-width">
-                <label>Achievement</label>
-                <input
-                  type="text"
-                  name="achievement"
-                  value={formData.achievement}
-                  onChange={handleInputChange}
-                  placeholder="Achievement clause"
-                />
-              </div>
-              <div className="form-group full-width">
-                <label>Competition</label>
-                <input
-                  type="text"
-                  name="competition"
-                  value={formData.competition}
-                  onChange={handleInputChange}
-                  placeholder="Competition clause"
-                />
-              </div>
-              <div className="form-group full-width">
                 <label>NOT Clause</label>
                 <input
                   type="text"
@@ -529,6 +555,87 @@ function App() {
                 />
               </div>
             </div>
+          </section>
+
+          <section className="form-section">
+            <h2>Bonuses</h2>
+            {formData.bonuses.map((bonus, competitionIndex) => (
+              <div key={competitionIndex} className="bonus-competition">
+                <div className="bonus-competition-header">
+                  <h3>Competition {competitionIndex + 1}</h3>
+                  {formData.bonuses.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeCompetition(competitionIndex)}
+                      className="btn-remove"
+                    >
+                      Remove Competition
+                    </button>
+                  )}
+                </div>
+
+                <div className="form-group full-width">
+                  <label>Competition Name</label>
+                  <input
+                    type="text"
+                    value={bonus.competitionName}
+                    onChange={(e) => handleBonusCompetitionChange(competitionIndex, e.target.value)}
+                    placeholder="e.g., Basketball Super League (BSL)"
+                  />
+                </div>
+
+                <div className="achievements-list">
+                  <h4>Achievements</h4>
+                  {bonus.achievements.map((achievement, achievementIndex) => (
+                    <div key={achievementIndex} className="achievement-item">
+                      <div className="form-grid">
+                        <div className="form-group">
+                          <label>Achievement Description</label>
+                          <input
+                            type="text"
+                            value={achievement.description}
+                            onChange={(e) => handleAchievementChange(competitionIndex, achievementIndex, 'description', e.target.value)}
+                            placeholder="e.g., For each win"
+                          />
+                        </div>
+                        <div className="form-group">
+                          <label>Bonus Amount</label>
+                          <input
+                            type="text"
+                            value={achievement.amount}
+                            onChange={(e) => handleAchievementChange(competitionIndex, achievementIndex, 'amount', e.target.value)}
+                            placeholder="e.g., $400 (four hundred U.S. dollars)"
+                          />
+                        </div>
+                      </div>
+                      {bonus.achievements.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeAchievement(competitionIndex, achievementIndex)}
+                          className="btn-remove-small"
+                        >
+                          Remove
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => addAchievement(competitionIndex)}
+                    className="btn-add"
+                  >
+                    + Add Achievement
+                  </button>
+                </div>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={addCompetition}
+              className="btn-add-large"
+            >
+              + Add Competition
+            </button>
           </section>
 
           {error && <div className="alert alert-error">{error}</div>}

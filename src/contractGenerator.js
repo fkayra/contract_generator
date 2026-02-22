@@ -60,6 +60,43 @@ export const generateContract = async (formData) => {
   content = content.replace(/\{MULTI_SEASON_CLAUSE\}/g, multiSeasonClause)
   content = content.replace(/\{MULTI_SEASON_CLAUSE_FULL\}/g, multiSeasonClauseFull)
 
+  if (formData.bonuses && formData.bonuses.length > 0) {
+    let bonusText = ''
+
+    formData.bonuses.forEach((bonus, index) => {
+      if (bonus.competitionName && bonus.achievements.some(a => a.description || a.amount)) {
+        bonusText += `\n${bonus.competitionName}:\n`
+
+        bonus.achievements.forEach(achievement => {
+          if (achievement.description || achievement.amount) {
+            bonusText += `• ${achievement.description}: ${achievement.amount}\n`
+          }
+        })
+
+        if (index < formData.bonuses.length - 1) {
+          bonusText += '\n'
+        }
+      }
+    })
+
+    const createFlexibleRegex = (pattern) => {
+      const parts = pattern.split('').map(char => {
+        if (char === '[' || char === ']' || char === '(' || char === ')') {
+          return '\\' + char
+        }
+        return char
+      })
+      const flexible = parts.join('(?:<[^>]*>)*')
+      return new RegExp(flexible, 'g')
+    }
+
+    const competitionRegex = createFlexibleRegex('[COMPETITION]')
+    const achievementRegex = createFlexibleRegex('[ACHIEVEMENT]')
+
+    content = content.replace(competitionRegex, bonusText)
+    content = content.replace(achievementRegex, '')
+  }
+
   if (formData.paymentSchedule && formData.paymentSchedule.length > 0) {
     const getOrdinalSuffix = (num) => {
       if (num === 1) return 'ST'
