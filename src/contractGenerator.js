@@ -191,9 +191,16 @@ export const generateContract = async (formData) => {
       console.log('First 200 chars:', additionalSeasonXML.substring(0, 200))
 
       const beforeLength = content.length
-      // Find and replace the entire paragraph containing [ADDITIONAL SEASON]
-      const placeholderRegex = /<w:p[^>]*>.*?\[ADDITIONAL SEASON\].*?<\/w:p>/s
-      content = content.replace(placeholderRegex, additionalSeasonXML)
+      // The placeholder is in paragraph with paraId="00000033"
+      // Replace this specific paragraph with our new content
+      const placeholderRegex = /<w:p[^>]*w14:paraId="00000033"[^>]*>.*?<\/w:p>/s
+      const match = content.match(placeholderRegex)
+      if (match) {
+        console.log('Found placeholder paragraph (paraId=00000033), replacing with season 2 content')
+        content = content.replace(placeholderRegex, additionalSeasonXML)
+      } else {
+        console.log('WARNING: Could not find paragraph with paraId=00000033!')
+      }
       // Remove the wrong placeholder (with underscore) if it exists
       content = content.replace('[ADDITIONAL_SEASON]', '')
       const afterLength = content.length
@@ -205,8 +212,8 @@ export const generateContract = async (formData) => {
       console.log('Still has [ADDITIONAL SEASON]?', content.includes('[ADDITIONAL SEASON]'))
     } else {
       console.log('No second season, removing placeholders')
-      // Remove the paragraph containing [ADDITIONAL SEASON]
-      const placeholderRegex = /<w:p[^>]*>.*?\[ADDITIONAL SEASON\].*?<\/w:p>/s
+      // Remove the paragraph with paraId="00000033" that contains [ADDITIONAL SEASON]
+      const placeholderRegex = /<w:p[^>]*w14:paraId="00000033"[^>]*>.*?<\/w:p>/s
       content = content.replace(placeholderRegex, '')
       // Remove the wrong placeholder (with underscore) if it exists
       content = content.replace('[ADDITIONAL_SEASON]', '')
