@@ -191,9 +191,9 @@ export const generateContract = async (formData) => {
       console.log('First 200 chars:', additionalSeasonXML.substring(0, 200))
 
       const beforeLength = content.length
-      // Replace both variations of the placeholder
-      content = content.replace(/\[ADDITIONAL_SEASON\]/g, additionalSeasonXML)
-      content = content.replace(/\[ADDITIONAL SEASON\]/g, '')
+      // Replace the correct placeholder (with space) with content, and remove the wrong one (with underscore)
+      content = content.replace(/\[ADDITIONAL SEASON\]/g, additionalSeasonXML)
+      content = content.replace(/\[ADDITIONAL_SEASON\]/g, '')
       const afterLength = content.length
 
       console.log('Document length before replace:', beforeLength)
