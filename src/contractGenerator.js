@@ -2,6 +2,9 @@ import PizZip from 'pizzip'
 import { saveAs } from 'file-saver'
 
 export const generateContract = async (formData) => {
+  console.log('=== FORM DATA RECEIVED ===')
+  console.log(JSON.stringify(formData, null, 2))
+
   const response = await fetch('/template.docx')
   const arrayBuffer = await response.arrayBuffer()
 
@@ -71,17 +74,45 @@ export const generateContract = async (formData) => {
 
     const firstSeason = formData.seasons[0]
     if (firstSeason) {
-      content = content.replace(/\[TOTAL AMOUNT OF CONTRACY\]/g, firstSeason.totalSalary || '')
+      console.log('First Season Data:', firstSeason)
+
+      // Replace season header (paraId 0000001A): "[SEASON] Season: [TOTAL AMOUNT OF CONTRACY] [CURRENCY]..."
+      const seasonHeaderRegex = /<w:p[^>]*w14:paraId="0000001A"[^>]*>.*?<\/w:p>/s
+      const seasonHeaderMatch = content.match(seasonHeaderRegex)
+      if (seasonHeaderMatch) {
+        let header = seasonHeaderMatch[0]
+        header = header.replace(/\[SEASON\]/g, firstSeason.seasonName || formData.season || '2025/26')
+        header = header.replace(/\[TOTAL AMOUNT OF CONTRACY\]/g, firstSeason.totalSalary || '')
+        header = header.replace(/\[CURRENCY\]/g, formData.currency || '$')
+        header = header.replace(/\[COUNNAME OF THE COUNTRY\]/g, formData.countryName || '')
+        content = content.replace(seasonHeaderRegex, header)
+      }
+
+      // Replace payment schedule header (paraId 0000001C): "[SEASON] season schedule of payments:"
+      const scheduleHeaderRegex = /<w:p[^>]*w14:paraId="0000001C"[^>]*>.*?<\/w:p>/s
+      const scheduleHeaderMatch = content.match(scheduleHeaderRegex)
+      if (scheduleHeaderMatch) {
+        let scheduleHeader = scheduleHeaderMatch[0]
+        scheduleHeader = scheduleHeader.replace(/\[SEASON\]/g, firstSeason.seasonName || formData.season || '2025/26')
+        content = content.replace(scheduleHeaderRegex, scheduleHeader)
+      }
 
       const paymentParaIds = [
         '0000001E', '00000020', '00000022', '00000024', '00000026',
         '00000028', '0000002A', '0000002C', '0000002E', '00000030'
       ]
 
-      firstSeason.payments.forEach((payment, index) => {
-        const installmentNum = index + 1
+      // Only process the number of payments specified
+      const numPayments = parseInt(firstSeason.numberOfPayments) || firstSeason.payments.length
+      console.log('Number of payments to process:', numPayments)
+
+      for (let i = 0; i < numPayments && i < firstSeason.payments.length; i++) {
+        const payment = firstSeason.payments[i]
+        const installmentNum = i + 1
         const suffix = getOrdinalSuffix(installmentNum)
-        const paraId = paymentParaIds[index]
+        const paraId = paymentParaIds[i]
+
+        console.log(`Processing payment ${installmentNum}:`, payment)
 
         const paraRegex = new RegExp(`<w:p[^>]*w14:paraId="${paraId}"[^>]*>.*?</w:p>`, 's')
         const paraMatch = content.match(paraRegex)
@@ -96,13 +127,14 @@ export const generateContract = async (formData) => {
           }
 
           para = para.replace(/\[AMOUNT OF THAT MONTH\]/g, payment.amount || '')
+          para = para.replace(/\[COUNNAME OF THE COUNTRY\]/g, formData.countryName || '')
 
           content = content.replace(paraRegex, para)
         }
-      })
+      }
 
       // Remove unused payment paragraphs completely
-      for (let i = firstSeason.payments.length; i < 10; i++) {
+      for (let i = numPayments; i < 10; i++) {
         const paraId = paymentParaIds[i]
         const paraRegex = new RegExp(`<w:p[^>]*w14:paraId="${paraId}"[^>]*>.*?</w:p>`, 's')
         content = content.replace(paraRegex, '')
