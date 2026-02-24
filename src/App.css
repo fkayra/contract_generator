@@ -105,6 +105,45 @@ header p {
   border: 1px solid #e5e7eb;
 }
 
+.season-payment-section {
+  background: #f0f9ff;
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  border: 2px solid #0ea5e9;
+}
+
+.season-payment-section h3 {
+  color: #0c4a6e;
+  margin-bottom: 1.5rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.season-payment-section h4 {
+  color: #075985;
+  margin: 1.5rem 0 1rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #bae6fd;
+}
+
+.payments-container {
+  margin-top: 1rem;
+}
+
+.payment-header {
+  font-weight: 600;
+  color: #0c4a6e;
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+  padding: 0.5rem;
+  background: white;
+  border-radius: 6px;
+  border-left: 4px solid #0ea5e9;
+}
+
 .btn-add {
   background: #10b981;
   color: white;

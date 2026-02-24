@@ -88,7 +88,7 @@ export const generateContract = async (formData) => {
     content = content.replace(competitionRegex, bonusXML)
   }
 
-  if (formData.paymentSchedule && formData.paymentSchedule.length > 0) {
+  if (formData.seasons && formData.seasons.length > 0) {
     const getOrdinalSuffix = (num) => {
       if (num === 1) return 'ST'
       if (num === 2) return 'ND'
@@ -108,23 +108,52 @@ export const generateContract = async (formData) => {
       return new RegExp(flexible, 'g')
     }
 
-    formData.paymentSchedule.forEach((payment, index) => {
-      const installmentNum = index + 1
-      const suffix = getOrdinalSuffix(installmentNum)
+    const firstSeason = formData.seasons[0]
+    if (firstSeason) {
+      content = content.replace(/\[TOTAL AMOUNT OF CONTRACY\]/g, firstSeason.totalSalary || '')
 
-      if (installmentNum === 1) {
-        const pattern = `[DATE OF ${installmentNum}${suffix} SALARY]`
-        const regex = createFlexibleRegex(pattern)
-        content = content.replace(regex, payment.date || '')
-      } else {
-        const pattern = `DATE OF ${installmentNum}${suffix} SALARY`
-        const regex = createFlexibleRegex(pattern)
-        content = content.replace(regex, payment.date || '')
-      }
+      firstSeason.payments.forEach((payment, index) => {
+        const installmentNum = index + 1
+        const suffix = getOrdinalSuffix(installmentNum)
 
-      const amountRegex = createFlexibleRegex('[AMOUNT OF THAT MONTH]')
-      content = content.replace(amountRegex, payment.amount || '')
-    })
+        if (installmentNum === 1) {
+          const pattern = `[DATE OF ${installmentNum}${suffix} SALARY]`
+          const regex = createFlexibleRegex(pattern)
+          content = content.replace(regex, payment.date || '')
+        } else {
+          const pattern = `DATE OF ${installmentNum}${suffix} SALARY`
+          const regex = createFlexibleRegex(pattern)
+          content = content.replace(regex, payment.date || '')
+        }
+
+        const amountPattern = `[AMOUNT OF THAT MONTH]`
+        const amountRegex = createFlexibleRegex(amountPattern)
+        let replaced = false
+        content = content.replace(amountRegex, (match) => {
+          if (!replaced) {
+            replaced = true
+            return payment.amount || ''
+          }
+          return match
+        })
+      })
+    }
+
+    if (formData.seasons.length > 1) {
+      const secondSeason = formData.seasons[1]
+
+      let additionalSeasonXML = `<w:p w:rsidR="00000000" w14:paraId="00000000"><w:pPr><w:jc w:val="both"/></w:pPr><w:r><w:t xml:space="preserve">${secondSeason.seasonName} Season: ${secondSeason.totalSalary} ${formData.currency} net of any ${formData.countryName} taxes</w:t></w:r></w:p>`
+
+      additionalSeasonXML += `<w:p w:rsidR="00000000" w14:paraId="00000000"><w:pPr><w:jc w:val="both"/></w:pPr><w:r><w:t xml:space="preserve">${secondSeason.seasonName} season schedule of payments:</w:t></w:r></w:p>`
+
+      secondSeason.payments.forEach((payment, index) => {
+        additionalSeasonXML += `<w:p w:rsidR="00000000" w14:paraId="00000000"><w:pPr><w:tabs><w:tab w:val="left" w:leader="none" w:pos="720"/><w:tab w:val="left" w:leader="none" w:pos="1440"/></w:tabs><w:jc w:val="both"/></w:pPr><w:r><w:rPr><w:rtl w:val="0"/></w:rPr><w:tab/><w:t xml:space="preserve">${payment.date}: ${payment.amount} net of any ${formData.countryName} taxes</w:t></w:r></w:p>`
+      })
+
+      content = content.replace(/\[ADDITIONAL SEASON\]/g, additionalSeasonXML)
+    } else {
+      content = content.replace(/\[ADDITIONAL SEASON\]/g, '')
+    }
   }
 
   zip.file('word/document.xml', content)
