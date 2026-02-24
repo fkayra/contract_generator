@@ -222,67 +222,53 @@ export const generateContract = async (formData) => {
 
   // Agency Fee Section - Process each season's agency fee
   if (formData.seasons && formData.seasons.length > 0) {
-    let allAgencyFeeXML = ''
+    let additionalParagraphs = []
 
     // Build agency fee content for all seasons
     formData.seasons.forEach((season, seasonIndex) => {
       if (season.agencyFee && season.agencyFee.totalAmount) {
-        const seasonName = season.seasonName || `Season ${seasonIndex + 1}`
-        const totalAmount = season.agencyFee.totalAmount
-        const countryName = formData.countryName || 'Türkiye'
-
-        // Season header with total amount
-        if (seasonIndex === 0) {
-          // First season - update the existing paragraph
-          allAgencyFeeXML += `A total of ${formData.currency}${totalAmount}, net of ${countryName} taxes,\nshall be paid for the ${seasonName} season`
-
-          // Add payment count if there are payments
-          if (season.agencyFee.payments && season.agencyFee.payments.length > 0) {
-            const numPayments = season.agencyFee.payments.filter(p => p.amount).length
-            if (numPayments > 1) {
-              allAgencyFeeXML += ` in ${numPayments} instalments:\n`
-            } else if (numPayments === 1) {
-              allAgencyFeeXML += ` in one instalment:\n`
-            }
-          }
-        } else {
-          // Additional seasons
-          allAgencyFeeXML += `\n\nA total of ${formData.currency}${totalAmount}, net of ${countryName} taxes,\nshall be paid for the ${seasonName} season`
-
-          if (season.agencyFee.payments && season.agencyFee.payments.length > 0) {
-            const numPayments = season.agencyFee.payments.filter(p => p.amount).length
-            if (numPayments > 1) {
-              allAgencyFeeXML += ` in ${numPayments} instalments:\n`
-            } else if (numPayments === 1) {
-              allAgencyFeeXML += ` in one instalment:\n`
-            }
-          }
-        }
-
-        // Add individual payment details
+        // Add individual payment details as separate paragraphs
         if (season.agencyFee.payments && season.agencyFee.payments.length > 0) {
           season.agencyFee.payments.forEach((payment, paymentIndex) => {
             if (payment.amount && payment.date) {
-              const isFirst = paymentIndex === 0
-              const connector = isFirst ? '• ' : '• and '
-              allAgencyFeeXML += `${connector}${formData.currency}${payment.amount} net of ${countryName} taxes no later than\n${payment.date} will be directed from the CLUB to the Agent on behalf of the Player\n`
+              const countryName = formData.countryName || 'Türkiye'
+              const connector = paymentIndex === 0 ? '• ' : '• and '
+              const text = `${connector}${formData.currency}${payment.amount} net of ${countryName} taxes no later than ${payment.date} will be directed from the CLUB to the Agent on behalf of the Player`
+
+              additionalParagraphs.push(`<w:p w:rsidR="00000000" w:rsidDel="00000000" w:rsidP="00000000" w:rsidRDefault="00000000" w:rsidRPr="00000000" w14:paraId="0000006${seasonIndex}${paymentIndex}"><w:pPr><w:tabs><w:tab w:val="left" w:leader="none" w:pos="0"/><w:tab w:val="left" w:leader="none" w:pos="720"/><w:tab w:val="left" w:leader="none" w:pos="1440"/><w:tab w:val="left" w:leader="none" w:pos="2160"/><w:tab w:val="left" w:leader="none" w:pos="2880"/><w:tab w:val="left" w:leader="none" w:pos="3600"/><w:tab w:val="left" w:leader="none" w:pos="4320"/><w:tab w:val="left" w:leader="none" w:pos="5040"/><w:tab w:val="left" w:leader="none" w:pos="5760"/><w:tab w:val="left" w:leader="none" w:pos="6480"/><w:tab w:val="left" w:leader="none" w:pos="7200"/><w:tab w:val="left" w:leader="none" w:pos="7920"/><w:tab w:val="left" w:leader="none" w:pos="8640"/></w:tabs><w:jc w:val="both"/><w:rPr/></w:pPr><w:r w:rsidDel="00000000" w:rsidR="00000000" w:rsidRPr="00000000"><w:rPr><w:rtl w:val="0"/></w:rPr><w:t xml:space="preserve">${text}</w:t></w:r></w:p>`)
             }
           })
         }
       }
     })
 
-    // Replace the placeholder paragraph with detailed agency fee info
-    if (allAgencyFeeXML) {
-      const agencyFeeRegex = /<w:p[^>]*w14:paraId="0000005F"[^>]*>.*?<\/w:p>/s
-      const agencyFeeMatch = content.match(agencyFeeRegex)
+    // Replace the placeholder paragraph and add payment detail paragraphs after it
+    const agencyFeeRegex = /<w:p[^>]*w14:paraId="0000005F"[^>]*>.*?<\/w:p>/s
+    const agencyFeeMatch = content.match(agencyFeeRegex)
 
-      if (agencyFeeMatch) {
-        // Build the replacement paragraph with proper formatting
-        const replacementXML = `<w:p w:rsidR="00000000" w:rsidDel="00000000" w:rsidP="00000000" w:rsidRDefault="00000000" w:rsidRPr="00000000" w14:paraId="0000005F"><w:pPr><w:tabs><w:tab w:val="left" w:leader="none" w:pos="0"/><w:tab w:val="left" w:leader="none" w:pos="720"/><w:tab w:val="left" w:leader="none" w:pos="1440"/><w:tab w:val="left" w:leader="none" w:pos="2160"/><w:tab w:val="left" w:leader="none" w:pos="2880"/><w:tab w:val="left" w:leader="none" w:pos="3600"/><w:tab w:val="left" w:leader="none" w:pos="4320"/><w:tab w:val="left" w:leader="none" w:pos="5040"/><w:tab w:val="left" w:leader="none" w:pos="5760"/><w:tab w:val="left" w:leader="none" w:pos="6480"/><w:tab w:val="left" w:leader="none" w:pos="7200"/><w:tab w:val="left" w:leader="none" w:pos="7920"/><w:tab w:val="left" w:leader="none" w:pos="8640"/></w:tabs><w:jc w:val="both"/><w:rPr/></w:pPr><w:r w:rsidDel="00000000" w:rsidR="00000000" w:rsidRPr="00000000"><w:rPr><w:rtl w:val="0"/></w:rPr><w:t xml:space="preserve">${allAgencyFeeXML}</w:t></w:r></w:p>`
+    if (agencyFeeMatch) {
+      let agencyFeePara = agencyFeeMatch[0]
 
-        content = content.replace(agencyFeeRegex, replacementXML)
+      // Update the main paragraph with season info (keep existing format)
+      if (formData.seasons.length > 0) {
+        const firstSeason = formData.seasons[0]
+        agencyFeePara = agencyFeePara.replace(/\[SEASON\]/g, firstSeason.seasonName || '2025/26')
+        agencyFeePara = agencyFeePara.replace(/\[AMOUNT OF THAT MONTH\]/g, firstSeason.agencyFee?.totalAmount || '')
+        agencyFeePara = agencyFeePara.replace(/\[COUNNAME OF THE COUNTRY\]/g, formData.countryName || 'Türkiye')
+
+        // If there's a second season, add it
+        if (formData.seasons.length > 1) {
+          const secondSeason = formData.seasons[1]
+          if (secondSeason && secondSeason.agencyFee && secondSeason.agencyFee.totalAmount) {
+            const secondSeasonXML = `<w:p w:rsidR="00000000" w:rsidDel="00000000" w:rsidP="00000000" w:rsidRDefault="00000000" w:rsidRPr="00000000" w14:paraId="00000060"><w:pPr><w:tabs><w:tab w:val="left" w:leader="none" w:pos="0"/><w:tab w:val="left" w:leader="none" w:pos="720"/><w:tab w:val="left" w:leader="none" w:pos="1440"/><w:tab w:val="left" w:leader="none" w:pos="2160"/><w:tab w:val="left" w:leader="none" w:pos="2880"/><w:tab w:val="left" w:leader="none" w:pos="3600"/><w:tab w:val="left" w:leader="none" w:pos="4320"/><w:tab w:val="left" w:leader="none" w:pos="5040"/><w:tab w:val="left" w:leader="none" w:pos="5760"/><w:tab w:val="left" w:leader="none" w:pos="6480"/><w:tab w:val="left" w:leader="none" w:pos="7200"/><w:tab w:val="left" w:leader="none" w:pos="7920"/><w:tab w:val="left" w:leader="none" w:pos="8640"/></w:tabs><w:jc w:val="both"/><w:rPr/></w:pPr><w:r w:rsidDel="00000000" w:rsidR="00000000" w:rsidRPr="00000000"><w:rPr><w:rtl w:val="0"/></w:rPr><w:t xml:space="preserve">            ${secondSeason.seasonName} season: ${secondSeason.agencyFee.totalAmount} net of any ${formData.countryName || 'Türkiye'} taxes</w:t></w:r></w:p>`
+            additionalParagraphs.unshift(secondSeasonXML)
+          }
+        }
       }
+
+      // Add all payment detail paragraphs after the main paragraph
+      const fullReplacement = agencyFeePara + additionalParagraphs.join('')
+      content = content.replace(agencyFeeRegex, fullReplacement)
     }
   }
 
