@@ -108,6 +108,11 @@ export const generateContract = async (formData) => {
         '00000028', '0000002A', '0000002C', '0000002E', '00000030'
       ]
 
+      const emptyParaIds = [
+        '0000001F', '00000021', '00000023', '00000025', '00000027',
+        '00000029', '0000002B', '0000002D', '0000002F'
+      ]
+
       // Only process the number of payments specified
       const numPayments = parseInt(firstSeason.numberOfPayments) || firstSeason.payments.length
       console.log('Number of payments to process:', numPayments)
@@ -150,11 +155,17 @@ export const generateContract = async (formData) => {
         }
       }
 
-      // Remove unused payment paragraphs completely
+      // Remove unused payment paragraphs and their preceding empty paragraphs
       for (let i = numPayments; i < 10; i++) {
         const paraId = paymentParaIds[i]
         const paraRegex = new RegExp(`<w:p[^>]*w14:paraId="${paraId}"[^>]*>.*?</w:p>`, 's')
         content = content.replace(paraRegex, '')
+
+        if (i < emptyParaIds.length) {
+          const emptyParaId = emptyParaIds[i]
+          const emptyParaRegex = new RegExp(`<w:p[^>]*w14:paraId="${emptyParaId}"[^>]*>.*?</w:p>`, 's')
+          content = content.replace(emptyParaRegex, '')
+        }
       }
     }
 
