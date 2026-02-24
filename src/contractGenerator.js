@@ -169,8 +169,12 @@ export const generateContract = async (formData) => {
       }
     }
 
+    console.log('Checking seasons:', formData.seasons)
+    console.log('Number of seasons:', formData.seasons?.length)
+
     if (formData.seasons.length > 1) {
       const secondSeason = formData.seasons[1]
+      console.log('Second season found:', secondSeason)
 
       let additionalSeasonXML = `<w:p w:rsidR="00000000" w14:paraId="00000000"><w:pPr><w:jc w:val="both"/></w:pPr><w:r><w:t xml:space="preserve">${secondSeason.seasonName} Season: ${secondSeason.totalSalary} ${formData.currency} net of any ${formData.countryName} taxes</w:t></w:r></w:p>`
 
@@ -180,8 +184,10 @@ export const generateContract = async (formData) => {
         additionalSeasonXML += `<w:p w:rsidR="00000000" w14:paraId="00000000"><w:pPr><w:tabs><w:tab w:val="left" w:leader="none" w:pos="720"/><w:tab w:val="left" w:leader="none" w:pos="1440"/></w:tabs><w:jc w:val="both"/></w:pPr><w:r><w:rPr><w:rtl w:val="0"/></w:rPr><w:tab/><w:t xml:space="preserve">${payment.date}: ${payment.amount} net of any ${formData.countryName} taxes</w:t></w:r></w:p>`
       })
 
+      console.log('Generated additional season XML length:', additionalSeasonXML.length)
       content = content.replace(/\[ADDITIONAL SEASON\]/g, additionalSeasonXML)
     } else {
+      console.log('No second season, removing placeholder')
       content = content.replace(/\[ADDITIONAL SEASON\]/g, '')
     }
   }
