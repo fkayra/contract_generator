@@ -222,35 +222,66 @@ export const generateContract = async (formData) => {
 
   // Agency Fee Section - Process each season's agency fee
   if (formData.seasons && formData.seasons.length > 0) {
-    // First season agency fee (paraId 0000005F)
-    const firstSeason = formData.seasons[0]
-    if (firstSeason && firstSeason.agencyFee) {
+    let allAgencyFeeXML = ''
+
+    // Build agency fee content for all seasons
+    formData.seasons.forEach((season, seasonIndex) => {
+      if (season.agencyFee && season.agencyFee.totalAmount) {
+        const seasonName = season.seasonName || `Season ${seasonIndex + 1}`
+        const totalAmount = season.agencyFee.totalAmount
+        const countryName = formData.countryName || 'Türkiye'
+
+        // Season header with total amount
+        if (seasonIndex === 0) {
+          // First season - update the existing paragraph
+          allAgencyFeeXML += `A total of ${formData.currency}${totalAmount}, net of ${countryName} taxes,\nshall be paid for the ${seasonName} season`
+
+          // Add payment count if there are payments
+          if (season.agencyFee.payments && season.agencyFee.payments.length > 0) {
+            const numPayments = season.agencyFee.payments.filter(p => p.amount).length
+            if (numPayments > 1) {
+              allAgencyFeeXML += ` in ${numPayments} instalments:\n`
+            } else if (numPayments === 1) {
+              allAgencyFeeXML += ` in one instalment:\n`
+            }
+          }
+        } else {
+          // Additional seasons
+          allAgencyFeeXML += `\n\nA total of ${formData.currency}${totalAmount}, net of ${countryName} taxes,\nshall be paid for the ${seasonName} season`
+
+          if (season.agencyFee.payments && season.agencyFee.payments.length > 0) {
+            const numPayments = season.agencyFee.payments.filter(p => p.amount).length
+            if (numPayments > 1) {
+              allAgencyFeeXML += ` in ${numPayments} instalments:\n`
+            } else if (numPayments === 1) {
+              allAgencyFeeXML += ` in one instalment:\n`
+            }
+          }
+        }
+
+        // Add individual payment details
+        if (season.agencyFee.payments && season.agencyFee.payments.length > 0) {
+          season.agencyFee.payments.forEach((payment, paymentIndex) => {
+            if (payment.amount && payment.date) {
+              const isFirst = paymentIndex === 0
+              const connector = isFirst ? '• ' : '• and '
+              allAgencyFeeXML += `${connector}${formData.currency}${payment.amount} net of ${countryName} taxes no later than\n${payment.date} will be directed from the CLUB to the Agent on behalf of the Player\n`
+            }
+          })
+        }
+      }
+    })
+
+    // Replace the placeholder paragraph with detailed agency fee info
+    if (allAgencyFeeXML) {
       const agencyFeeRegex = /<w:p[^>]*w14:paraId="0000005F"[^>]*>.*?<\/w:p>/s
       const agencyFeeMatch = content.match(agencyFeeRegex)
 
       if (agencyFeeMatch) {
-        let agencyFeePara = agencyFeeMatch[0]
-        agencyFeePara = agencyFeePara.replace(/\[SEASON\]/g, firstSeason.seasonName || formData.season || '2025/26')
-        agencyFeePara = agencyFeePara.replace(/\[AMOUNT OF THAT MONTH\]/g, firstSeason.agencyFee.totalAmount || '')
-        agencyFeePara = agencyFeePara.replace(/\[COUNNAME OF THE COUNTRY\]/g, formData.countryName || '')
-        content = content.replace(agencyFeeRegex, agencyFeePara)
-      }
-    }
+        // Build the replacement paragraph with proper formatting
+        const replacementXML = `<w:p w:rsidR="00000000" w:rsidDel="00000000" w:rsidP="00000000" w:rsidRDefault="00000000" w:rsidRPr="00000000" w14:paraId="0000005F"><w:pPr><w:tabs><w:tab w:val="left" w:leader="none" w:pos="0"/><w:tab w:val="left" w:leader="none" w:pos="720"/><w:tab w:val="left" w:leader="none" w:pos="1440"/><w:tab w:val="left" w:leader="none" w:pos="2160"/><w:tab w:val="left" w:leader="none" w:pos="2880"/><w:tab w:val="left" w:leader="none" w:pos="3600"/><w:tab w:val="left" w:leader="none" w:pos="4320"/><w:tab w:val="left" w:leader="none" w:pos="5040"/><w:tab w:val="left" w:leader="none" w:pos="5760"/><w:tab w:val="left" w:leader="none" w:pos="6480"/><w:tab w:val="left" w:leader="none" w:pos="7200"/><w:tab w:val="left" w:leader="none" w:pos="7920"/><w:tab w:val="left" w:leader="none" w:pos="8640"/></w:tabs><w:jc w:val="both"/><w:rPr/></w:pPr><w:r w:rsidDel="00000000" w:rsidR="00000000" w:rsidRPr="00000000"><w:rPr><w:rtl w:val="0"/></w:rPr><w:t xml:space="preserve">${allAgencyFeeXML}</w:t></w:r></w:p>`
 
-    // If there's a second season, we need to add agency fee info after first season
-    if (formData.seasons.length > 1) {
-      const secondSeason = formData.seasons[1]
-      if (secondSeason && secondSeason.agencyFee && secondSeason.agencyFee.totalAmount) {
-        // Create XML for second season agency fee - add after paraId 0000005F
-        const agencyFeeXML = `
-<w:p w:rsidR="00000000" w:rsidDel="00000000" w:rsidP="00000000" w:rsidRDefault="00000000" w:rsidRPr="00000000" w14:paraId="00000060"><w:pPr><w:tabs><w:tab w:val="left" w:leader="none" w:pos="0"/><w:tab w:val="left" w:leader="none" w:pos="720"/><w:tab w:val="left" w:leader="none" w:pos="1440"/><w:tab w:val="left" w:leader="none" w:pos="2160"/><w:tab w:val="left" w:leader="none" w:pos="2880"/><w:tab w:val="left" w:leader="none" w:pos="3600"/><w:tab w:val="left" w:leader="none" w:pos="4320"/><w:tab w:val="left" w:leader="none" w:pos="5040"/><w:tab w:val="left" w:leader="none" w:pos="5760"/><w:tab w:val="left" w:leader="none" w:pos="6480"/><w:tab w:val="left" w:leader="none" w:pos="7200"/><w:tab w:val="left" w:leader="none" w:pos="7920"/><w:tab w:val="left" w:leader="none" w:pos="8640"/></w:tabs><w:jc w:val="both"/><w:rPr/></w:pPr><w:r w:rsidDel="00000000" w:rsidR="00000000" w:rsidRPr="00000000"><w:rPr><w:rtl w:val="0"/></w:rPr><w:t xml:space="preserve">            ${secondSeason.seasonName} season: ${secondSeason.agencyFee.totalAmount} net of any ${formData.countryName || 'Türkiye'} taxes</w:t></w:r></w:p>
-`
-        // Find paragraph 0000005F and insert after it
-        const firstAgencyPara = /<w:p[^>]*w14:paraId="0000005F"[^>]*>.*?<\/w:p>/s
-        const match = content.match(firstAgencyPara)
-        if (match) {
-          content = content.replace(firstAgencyPara, match[0] + agencyFeeXML)
-        }
+        content = content.replace(agencyFeeRegex, replacementXML)
       }
     }
   }
