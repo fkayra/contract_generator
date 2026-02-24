@@ -173,6 +173,7 @@ export const generateContract = async (formData) => {
     console.log('Checking seasons:', formData.seasons)
     console.log('Number of seasons:', formData.seasons?.length)
     console.log('Has [ADDITIONAL_SEASON] placeholder?', content.includes('[ADDITIONAL_SEASON]'))
+    console.log('Has [ADDITIONAL SEASON] placeholder?', content.includes('[ADDITIONAL SEASON]'))
 
     if (formData.seasons.length > 1) {
       const secondSeason = formData.seasons[1]
@@ -190,16 +191,20 @@ export const generateContract = async (formData) => {
       console.log('First 200 chars:', additionalSeasonXML.substring(0, 200))
 
       const beforeLength = content.length
+      // Replace both variations of the placeholder
       content = content.replace(/\[ADDITIONAL_SEASON\]/g, additionalSeasonXML)
+      content = content.replace(/\[ADDITIONAL SEASON\]/g, '')
       const afterLength = content.length
 
       console.log('Document length before replace:', beforeLength)
       console.log('Document length after replace:', afterLength)
       console.log('Length difference:', afterLength - beforeLength)
-      console.log('Still has placeholder?', content.includes('[ADDITIONAL_SEASON]'))
+      console.log('Still has [ADDITIONAL_SEASON]?', content.includes('[ADDITIONAL_SEASON]'))
+      console.log('Still has [ADDITIONAL SEASON]?', content.includes('[ADDITIONAL SEASON]'))
     } else {
-      console.log('No second season, removing placeholder')
+      console.log('No second season, removing placeholders')
       content = content.replace(/\[ADDITIONAL_SEASON\]/g, '')
+      content = content.replace(/\[ADDITIONAL SEASON\]/g, '')
     }
   }
 
