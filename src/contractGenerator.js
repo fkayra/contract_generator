@@ -191,9 +191,11 @@ export const generateContract = async (formData) => {
       console.log('First 200 chars:', additionalSeasonXML.substring(0, 200))
 
       const beforeLength = content.length
-      // Replace the correct placeholder (with space) with content, and remove the wrong one (with underscore)
-      content = content.replace(/\[ADDITIONAL SEASON\]/g, additionalSeasonXML)
-      content = content.replace(/\[ADDITIONAL_SEASON\]/g, '')
+      // Find and replace the entire paragraph containing [ADDITIONAL SEASON]
+      const placeholderRegex = /<w:p[^>]*>.*?\[ADDITIONAL SEASON\].*?<\/w:p>/s
+      content = content.replace(placeholderRegex, additionalSeasonXML)
+      // Remove the wrong placeholder (with underscore) if it exists
+      content = content.replace('[ADDITIONAL_SEASON]', '')
       const afterLength = content.length
 
       console.log('Document length before replace:', beforeLength)
@@ -203,8 +205,11 @@ export const generateContract = async (formData) => {
       console.log('Still has [ADDITIONAL SEASON]?', content.includes('[ADDITIONAL SEASON]'))
     } else {
       console.log('No second season, removing placeholders')
-      content = content.replace(/\[ADDITIONAL_SEASON\]/g, '')
-      content = content.replace(/\[ADDITIONAL SEASON\]/g, '')
+      // Remove the paragraph containing [ADDITIONAL SEASON]
+      const placeholderRegex = /<w:p[^>]*>.*?\[ADDITIONAL SEASON\].*?<\/w:p>/s
+      content = content.replace(placeholderRegex, '')
+      // Remove the wrong placeholder (with underscore) if it exists
+      content = content.replace('[ADDITIONAL_SEASON]', '')
     }
   }
 
