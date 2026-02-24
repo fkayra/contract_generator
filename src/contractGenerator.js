@@ -29,7 +29,7 @@ export const generateContract = async (formData) => {
   content = content.replace(/\[COUNTRY OF THE PLAYER\]/g, formData.playerCountry || '')
   content = content.replace(/\[COUNTRY OF THE TEAM\]/g, formData.teamCountry || '')
   content = content.replace(/\[CURRENCY\]/g, formData.currency || '€')
-  content = content.replace(/\[TOTAL AMOUNT OF CONTRACY\]/g, formData.totalSalary || '')
+  content = content.replace(/\[TOTAL AMOUNT OF CONTRACY\]/g, formData.seasons[0]?.totalSalary || '')
   content = content.replace(/\[TEAM BUY OUT AMOUNT\]/g, formData.teamBuyoutAmount || '')
   content = content.replace(/\[PLAYER BUY OUT AMOUNT\]/g, formData.playerBuyoutAmount || '')
   content = content.replace(/\[DATE OF THE BUY OUT\]/g, formData.buyoutDate || '')
