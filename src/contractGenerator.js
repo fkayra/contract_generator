@@ -75,17 +75,23 @@ export const generateContract = async (formData) => {
     const firstSeason = formData.seasons[0]
     if (firstSeason) {
       console.log('First Season Data:', firstSeason)
+      console.log('Total Salary from firstSeason:', firstSeason.totalSalary)
+      console.log('Type of totalSalary:', typeof firstSeason.totalSalary)
 
       // Replace season header (paraId 0000001A): "[SEASON] Season: [TOTAL AMOUNT OF CONTRACY] [CURRENCY]..."
       const seasonHeaderRegex = /<w:p[^>]*w14:paraId="0000001A"[^>]*>.*?<\/w:p>/s
       const seasonHeaderMatch = content.match(seasonHeaderRegex)
       if (seasonHeaderMatch) {
         let header = seasonHeaderMatch[0]
+        console.log('Original header:', header.substring(0, 200))
         header = header.replace(/\[SEASON\]/g, firstSeason.seasonName || formData.season || '2025/26')
         header = header.replace(/\[TOTAL AMOUNT OF CONTRACY\]/g, firstSeason.totalSalary || '')
         header = header.replace(/\[CURRENCY\]/g, formData.currency || '$')
         header = header.replace(/\[COUNNAME OF THE COUNTRY\]/g, formData.countryName || '')
+        console.log('After replacements, header substring:', header.substring(0, 300))
         content = content.replace(seasonHeaderRegex, header)
+      } else {
+        console.log('ERROR: Season header paragraph not found!')
       }
 
       // Replace payment schedule header (paraId 0000001C): "[SEASON] season schedule of payments:"
