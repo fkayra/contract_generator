@@ -25,7 +25,12 @@ function App() {
         seasonName: '2025/26',
         totalSalary: '',
         numberOfPayments: '10',
-        payments: Array(10).fill(null).map(() => ({ date: '', amount: '' }))
+        payments: Array(10).fill(null).map(() => ({ date: '', amount: '' })),
+        agencyFee: {
+          totalAmount: '',
+          numberOfPayments: '1',
+          payments: [{ date: '', amount: '' }]
+        }
       }
     ],
     teamBuyoutAmount: '',
@@ -72,7 +77,12 @@ function App() {
             seasonName: `${year}/${(year + 1).toString().slice(2)}`,
             totalSalary: '',
             numberOfPayments: '10',
-            payments: Array(10).fill(null).map(() => ({ date: '', amount: '' }))
+            payments: Array(10).fill(null).map(() => ({ date: '', amount: '' })),
+            agencyFee: {
+              totalAmount: '',
+              numberOfPayments: '1',
+              payments: [{ date: '', amount: '' }]
+            }
           })
         }
       }
@@ -120,6 +130,40 @@ function App() {
   const handlePaymentChange = (seasonIndex, paymentIndex, field, value) => {
     const newSeasons = [...formData.seasons]
     newSeasons[seasonIndex].payments[paymentIndex][field] = value
+    setFormData(prev => ({ ...prev, seasons: newSeasons }))
+  }
+
+  const handleAgencyFeeChange = (seasonIndex, field, value) => {
+    const newSeasons = [...formData.seasons]
+
+    if (field === 'numberOfPayments') {
+      const numPayments = parseInt(value) || 1
+      const existingPayments = newSeasons[seasonIndex].agencyFee.payments || []
+      const newPayments = []
+
+      for (let i = 0; i < numPayments; i++) {
+        if (existingPayments[i]) {
+          newPayments.push(existingPayments[i])
+        } else {
+          newPayments.push({ date: '', amount: '' })
+        }
+      }
+
+      newSeasons[seasonIndex].agencyFee = {
+        ...newSeasons[seasonIndex].agencyFee,
+        numberOfPayments: value,
+        payments: newPayments
+      }
+    } else {
+      newSeasons[seasonIndex].agencyFee[field] = value
+    }
+
+    setFormData(prev => ({ ...prev, seasons: newSeasons }))
+  }
+
+  const handleAgencyFeePaymentChange = (seasonIndex, paymentIndex, field, value) => {
+    const newSeasons = [...formData.seasons]
+    newSeasons[seasonIndex].agencyFee.payments[paymentIndex][field] = value
     setFormData(prev => ({ ...prev, seasons: newSeasons }))
   }
 
@@ -492,6 +536,61 @@ function App() {
                       </div>
                     </div>
                   ))}
+                </div>
+
+                <div className="agency-fee-container" style={{ marginTop: '30px', borderTop: '2px solid #e0e0e0', paddingTop: '20px' }}>
+                  <h4>Agency Fee for {season.seasonName}</h4>
+                  <div className="form-grid">
+                    <div className="form-group">
+                      <label>Total Agency Fee</label>
+                      <input
+                        type="text"
+                        value={season.agencyFee.totalAmount}
+                        onChange={(e) => handleAgencyFeeChange(seasonIndex, 'totalAmount', e.target.value)}
+                        placeholder="e.g., 11,700"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Number of Agency Fee Payments</label>
+                      <select
+                        value={season.agencyFee.numberOfPayments}
+                        onChange={(e) => handleAgencyFeeChange(seasonIndex, 'numberOfPayments', e.target.value)}
+                      >
+                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (
+                          <option key={num} value={num}>{num}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="payments-container">
+                    <h5>Agency Fee Payment Schedule</h5>
+                    {season.agencyFee.payments.map((payment, paymentIndex) => (
+                      <div key={paymentIndex} className="payment-item">
+                        <div className="payment-header">Agency Fee Payment {paymentIndex + 1}</div>
+                        <div className="form-grid">
+                          <div className="form-group">
+                            <label>Date</label>
+                            <input
+                              type="text"
+                              value={payment.date}
+                              onChange={(e) => handleAgencyFeePaymentChange(seasonIndex, paymentIndex, 'date', e.target.value)}
+                              placeholder="e.g., November 5, 2025"
+                            />
+                          </div>
+                          <div className="form-group">
+                            <label>Amount</label>
+                            <input
+                              type="text"
+                              value={payment.amount}
+                              onChange={(e) => handleAgencyFeePaymentChange(seasonIndex, paymentIndex, 'amount', e.target.value)}
+                              placeholder="e.g., 5,850"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             ))}
