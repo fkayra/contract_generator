@@ -169,10 +169,17 @@ function App() {
     setError('')
     setSuccess('')
 
+    console.log('=== HANDLESUBMIT - FORM DATA ===')
+    console.log('Full formData:', formData)
+    console.log('Seasons array:', formData.seasons)
+    console.log('First season:', formData.seasons[0])
+    console.log('First season totalSalary:', formData.seasons[0]?.totalSalary)
+
     try {
       await generateContract(formData)
       setSuccess('Contract generated successfully!')
     } catch (err) {
+      console.error('Contract generation error:', err)
       setError(err.message || 'Failed to generate contract')
     } finally {
       setLoading(false)
