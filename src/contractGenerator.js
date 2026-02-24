@@ -47,7 +47,7 @@ export const generateContract = async (formData) => {
   content = content.replace(/\[ACHIEVEMENT\]/g, formData.achievement || '')
   // [COMPETITION] will be replaced later with bonus XML
   content = content.replace(/\[NOT\]/g, formData.notClause || '')
-  // [ADDITIONAL SEASON] will be replaced later with second season XML
+  // [ADDITIONAL_SEASON] will be replaced later with second season XML
 
   // Handle multi-season clause
   const isMultiSeason = formData.numberOfSeasons === '2'
@@ -172,7 +172,7 @@ export const generateContract = async (formData) => {
     console.log('=== SEASON CHECK ===')
     console.log('Checking seasons:', formData.seasons)
     console.log('Number of seasons:', formData.seasons?.length)
-    console.log('Has [ADDITIONAL SEASON] placeholder?', content.includes('[ADDITIONAL SEASON]'))
+    console.log('Has [ADDITIONAL_SEASON] placeholder?', content.includes('[ADDITIONAL_SEASON]'))
 
     if (formData.seasons.length > 1) {
       const secondSeason = formData.seasons[1]
@@ -190,16 +190,16 @@ export const generateContract = async (formData) => {
       console.log('First 200 chars:', additionalSeasonXML.substring(0, 200))
 
       const beforeLength = content.length
-      content = content.replace(/\[ADDITIONAL SEASON\]/g, additionalSeasonXML)
+      content = content.replace(/\[ADDITIONAL_SEASON\]/g, additionalSeasonXML)
       const afterLength = content.length
 
       console.log('Document length before replace:', beforeLength)
       console.log('Document length after replace:', afterLength)
       console.log('Length difference:', afterLength - beforeLength)
-      console.log('Still has placeholder?', content.includes('[ADDITIONAL SEASON]'))
+      console.log('Still has placeholder?', content.includes('[ADDITIONAL_SEASON]'))
     } else {
       console.log('No second season, removing placeholder')
-      content = content.replace(/\[ADDITIONAL SEASON\]/g, '')
+      content = content.replace(/\[ADDITIONAL_SEASON\]/g, '')
     }
   }
 

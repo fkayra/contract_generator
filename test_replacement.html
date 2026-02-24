@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Replacement</title>
+</head>
+<body>
+    <h1>Testing [ADDITIONAL_SEASON] replacement</h1>
+    <div id="output"></div>
+    
+    <script>
+        const formData = {
+            countryName: 'Türkiye',
+            currency: '€',
+            seasons: [
+                {
+                    seasonName: '2025/26',
+                    totalSalary: '100000',
+                    numberOfPayments: '2',
+                    payments: [
+                        { date: '1', amount: '15000' },
+                        { date: '2', amount: '85000' }
+                    ]
+                },
+                {
+                    seasonName: '2026/27',
+                    totalSalary: '20000',
+                    numberOfPayments: '1',
+                    payments: [
+                        { date: '2.1', amount: '20000' }
+                    ]
+                }
+            ]
+        };
+        
+        console.log('Number of seasons:', formData.seasons.length);
+        
+        if (formData.seasons.length > 1) {
+            const secondSeason = formData.seasons[1];
+            console.log('Second season:', secondSeason);
+            
+            let additionalSeasonXML = `<w:p w:rsidR="00000000" w14:paraId="00000000"><w:pPr><w:jc w:val="both"/></w:pPr><w:r><w:t xml:space="preserve">${secondSeason.seasonName} Season: ${secondSeason.totalSalary} ${formData.currency} net of any ${formData.countryName} taxes</w:t></w:r></w:p>`;
+
+            additionalSeasonXML += `<w:p w:rsidR="00000000" w14:paraId="00000000"><w:pPr><w:jc w:val="both"/></w:pPr><w:r><w:t xml:space="preserve">${secondSeason.seasonName} season schedule of payments:</w:t></w:r></w:p>`;
+
+            secondSeason.payments.forEach((payment, index) => {
+                additionalSeasonXML += `<w:p w:rsidR="00000000" w14:paraId="00000000"><w:pPr><w:tabs><w:tab w:val="left" w:leader="none" w:pos="720"/><w:tab w:val="left" w:leader="none" w:pos="1440"/></w:tabs><w:jc w:val="both"/></w:pPr><w:r><w:rPr><w:rtl w:val="0"/></w:rPr><w:tab/><w:t xml:space="preserve">${payment.date}: ${payment.amount} net of any ${formData.countryName} taxes</w:t></w:r></w:p>`;
+            });
+            
+            console.log('Generated XML:', additionalSeasonXML);
+            document.getElementById('output').innerHTML = '<pre>' + additionalSeasonXML.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</pre>';
+        }
+    </script>
+</body>
+</html>
