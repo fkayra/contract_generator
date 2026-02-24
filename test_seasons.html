@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Seasons</title>
+</head>
+<body>
+    <h1>Check Browser Console</h1>
+    <script>
+        // Simulate the form data from your screenshot
+        const testData = {
+            seasons: [
+                {
+                    seasonName: "2025/26",
+                    totalSalary: "$117,000 (seven hundred seventeen thousand U.S. dollars)",
+                    numberOfPayments: 10,
+                    payments: [
+                        { date: "after medical check", amount: "$ 5,000 (five thousand U.S. dollars)" },
+                        { date: "on October 1st 2025", amount: "$ 8,000 (eight thousand U.S. dollars)" },
+                        { date: "on November 1st 2025", amount: "$ 13,000 (thirteen thousand U.S. dollars)" },
+                        { date: "on December 1st 2025", amount: "$ 13,000 (thirteen thousand U.S. dollars)" },
+                        { date: "on January 1st 2026", amount: "$ 13,000 (thirteen thousand U.S. dollars)" },
+                        { date: "on February 1st 2026", amount: "$ 13,000 (thirteen thousand U.S. dollars)" },
+                        { date: "on March 1st 2026", amount: "$ 13,000 (thirteen thousand U.S. dollars)" },
+                        { date: "on April 1st 2026", amount: "$ 13,000 (thirteen thousand U.S. dollars)" },
+                        { date: "on May 1st 2026", amount: "$ 13,000 (thirteen thousand U.S. dollars)" },
+                        { date: "on June 1st 2026", amount: "$ 13,000 (thirteen thousand U.S. dollars)" }
+                    ]
+                },
+                {
+                    seasonName: "2026/27",
+                    totalSalary: "$117,000 (seven hundred seventeen thousand U.S. dollars)",
+                    numberOfPayments: 4,
+                    payments: [
+                        { date: "on May 1st 2026", amount: "12" },
+                        { date: "on June 1st 2026", amount: "12" },
+                        { date: "on April 1st 2026", amount: "13" },
+                        { date: "on March 1st 2026", amount: "41" }
+                    ]
+                }
+            ]
+        };
+
+        console.log('Test Data:', testData);
+        console.log('Number of seasons:', testData.seasons.length);
+        console.log('Second season:', testData.seasons[1]);
+        console.log('Has second season?', testData.seasons.length > 1);
+    </script>
+</body>
+</html>
