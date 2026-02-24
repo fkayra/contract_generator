@@ -132,14 +132,15 @@ export const generateContract = async (formData) => {
 
           if (installmentNum === 1) {
             // First payment has brackets: [DATE OF 1ST SALARY]
-            // Match pattern: [DATE OF 1</w:t></w:r><w:r...><w:t>ST</w:t></w:r><w:r...><w:t> SALARY]
-            const pattern1 = /\[DATE OF 1<\/w:t><\/w:r><w:r[^>]*>.*?<w:t[^>]*>ST<\/w:t><\/w:r><w:r[^>]*>.*?<w:t[^>]*> SALARY\]/s
-            para = para.replace(pattern1, `<w:t xml:space="preserve">${payment.date || ''}</w:t>`)
+            // We need to replace just the text content while preserving XML structure
+            para = para.replace(/\[DATE OF 1<\/w:t>/, `${payment.date || ''}</w:t>`)
+            para = para.replace(/<w:t xml:space="preserve">ST<\/w:t>/, '<w:t></w:t>')
+            para = para.replace(/<w:t xml:space="preserve"> SALARY\]/, '<w:t xml:space="preserve">')
           } else {
             // Other payments don't have brackets: DATE OF 2ND SALARY
-            // Match pattern: DATE OF 2</w:t></w:r><w:r...><w:t>ND</w:t></w:r><w:r...><w:t> SALARY
-            const pattern = new RegExp(`DATE OF ${installmentNum}<\\/w:t><\\/w:r><w:r[^>]*>.*?<w:t[^>]*>${suffix}<\\/w:t><\\/w:r><w:r[^>]*>.*?<w:t[^>]*> SALARY`, 's')
-            para = para.replace(pattern, `<w:t xml:space="preserve">${payment.date || ''}</w:t>`)
+            para = para.replace(new RegExp(`DATE OF ${installmentNum}<\\/w:t>`), `${payment.date || ''}</w:t>`)
+            para = para.replace(new RegExp(`<w:t xml:space="preserve">${suffix}<\\/w:t>`), '<w:t></w:t>')
+            para = para.replace(/<w:t xml:space="preserve"> SALARY/, '<w:t xml:space="preserve">')
           }
 
           para = para.replace(/\[AMOUNT OF THAT MONTH\]/g, payment.amount || '')
