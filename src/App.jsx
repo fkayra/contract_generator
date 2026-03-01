@@ -436,16 +436,6 @@ function App() {
                   placeholder="2026/27"
                 />
               </div>
-              <div className="form-group full-width">
-                <label>Additional Season Clause</label>
-                <input
-                  type="text"
-                  name="additionalSeasonClause"
-                  value={formData.additionalSeasonClause}
-                  onChange={handleInputChange}
-                  placeholder="e.g., 'and will restart at the beginning of season 2026/27'"
-                />
-              </div>
             </div>
           </section>
 

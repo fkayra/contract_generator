@@ -52,7 +52,7 @@ export const generateContract = async (formData) => {
   // Handle multi-season clause
   const isMultiSeason = formData.numberOfSeasons === '2'
   const multiSeasonClause = isMultiSeason
-    ? `(and will restart at the beginning of season ${formData.season2 || '2026/27'} to cease again 24 hours after the last official game of the Club for season ${formData.season2 || '2026/27'})`
+    ? `And will restart at the beginning of season ${formData.season2 || '2026/27'} to cease again 24 hours after the last official game of the Club for season ${formData.season2 || '2026/27'}`
     : ''
 
   const multiSeasonClauseFull = isMultiSeason
