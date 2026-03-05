@@ -43,38 +43,38 @@ export const generateInvoice = (invoice, index) => {
     }
     body {
       font-family: Arial, sans-serif;
-      margin: 25px 40px;
-      font-size: 11pt;
-      line-height: 1;
+      margin: 20px 30px;
+      font-size: 9pt;
+      line-height: 1.1;
     }
     .header {
       text-align: center;
-      margin-bottom: 15px;
+      margin-bottom: 10px;
     }
     .company-info {
       font-weight: bold;
-      line-height: 1;
-      font-size: 11pt;
+      line-height: 1.1;
+      font-size: 9pt;
     }
     .date {
       text-align: right;
-      margin-bottom: 12px;
-      font-size: 11pt;
+      margin-bottom: 8px;
+      font-size: 9pt;
     }
     .client-info-table {
-      width: 70%;
+      width: 60%;
       border-collapse: collapse;
-      margin-bottom: 15px;
+      margin-bottom: 10px;
     }
     .client-info-table td {
       border: 1px solid #000;
-      padding: 3px 8px;
+      padding: 2px 5px;
       vertical-align: top;
-      font-size: 11pt;
-      line-height: 1;
+      font-size: 9pt;
+      line-height: 1.1;
     }
     .client-info-table td:first-child {
-      width: 85px;
+      width: 70px;
       font-weight: bold;
       white-space: nowrap;
     }
@@ -83,40 +83,40 @@ export const generateInvoice = (invoice, index) => {
       word-break: normal;
     }
     .invoice-title {
-      font-size: 14pt;
+      font-size: 11pt;
       font-weight: bold;
-      margin: 12px 0;
+      margin: 8px 0;
       text-align: center;
     }
     .invoice-table {
-      width: 100%;
+      width: 85%;
       border-collapse: collapse;
-      margin: 12px 0;
+      margin: 10px 0;
     }
     .invoice-table td {
       border: 1px solid #000;
-      padding: 3px 8px;
-      font-size: 11pt;
-      line-height: 1;
+      padding: 2px 5px;
+      font-size: 9pt;
+      line-height: 1.1;
     }
     .invoice-table .header-row td {
       font-weight: bold;
       text-align: center;
     }
     .invoice-table .amount-col {
-      width: 140px;
+      width: 100px;
       text-align: right;
     }
     .invoice-table .total-row {
       font-weight: bold;
     }
     .payment-info {
-      margin-top: 15px;
-      line-height: 1;
-      font-size: 10pt;
+      margin-top: 10px;
+      line-height: 1.1;
+      font-size: 8pt;
     }
     .payment-info p {
-      margin: 1px 0;
+      margin: 0.5px 0;
     }
     hr {
       border: none;

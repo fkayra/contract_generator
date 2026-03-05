@@ -9,7 +9,8 @@ function InvoiceForm({ formData, onBack, onNavigate, editingInvoice }) {
     company: '',
     bank: '',
     currency: '',
-    includeVAT: 'no'
+    includeVAT: 'no',
+    invoiceNumber: ''
   })
 
   const [invoices, setInvoices] = useState(editingInvoice ? editingInvoice.invoice_data.invoices : [])
@@ -217,7 +218,7 @@ function InvoiceForm({ formData, onBack, onNavigate, editingInvoice }) {
 
       const dataToSave = {
         client_name: firstInvoice.clubName,
-        invoice_number: `INV-${Date.now()}`,
+        invoice_number: invoiceData.invoiceNumber || `INV-${Date.now()}`,
         invoice_data: {
           invoiceSettings: invoiceData,
           invoices: invoices,
@@ -369,8 +370,17 @@ function InvoiceForm({ formData, onBack, onNavigate, editingInvoice }) {
           </section>
 
           <section className="form-section">
-            <h2>VAT Settings</h2>
+            <h2>Invoice Settings</h2>
             <div className="form-grid">
+              <div className="form-group">
+                <label>Invoice Number</label>
+                <input
+                  type="text"
+                  value={invoiceData.invoiceNumber}
+                  onChange={(e) => setInvoiceData({ ...invoiceData, invoiceNumber: e.target.value })}
+                  placeholder="e.g., INV-2024-001"
+                />
+              </div>
               <div className="form-group">
                 <label>Include VAT (19%)</label>
                 <select
@@ -445,7 +455,9 @@ function InvoiceForm({ formData, onBack, onNavigate, editingInvoice }) {
             <button onClick={downloadInvoices} style={{ marginRight: '10px', padding: '15px 30px', fontSize: '16px' }}>
               Generate Invoices
             </button>
-            <button onClick={() => setStep(4)}>Back to Settings</button>
+            <button onClick={() => onNavigate('home')} style={{ padding: '15px 30px', fontSize: '16px' }}>
+              Back to Home
+            </button>
           </div>
         </div>
       )}
