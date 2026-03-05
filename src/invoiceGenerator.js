@@ -115,12 +115,12 @@ export const generateInvoice = (invoice, index) => {
     </tr>
     <tr>
       <td>Professional services for basketball agency</td>
-      <td style="text-align: right;">${invoice.currencySymbol} ${invoice.amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+      <td style="text-align: right;">${invoice.currencySymbol} ${invoice.amount.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
     </tr>
     ${invoice.includeVAT === 'yes' ? `
     <tr>
       <td>VAT (19%)</td>
-      <td style="text-align: right;">${invoice.currencySymbol} ${invoice.vatAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+      <td style="text-align: right;">${invoice.currencySymbol} ${invoice.vatAmount.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
     </tr>
     ` : `
     <tr>
@@ -130,7 +130,7 @@ export const generateInvoice = (invoice, index) => {
     `}
     <tr class="total-row">
       <td>Total: ${invoice.amountInWords} ${invoice.currency}</td>
-      <td style="text-align: right;">${invoice.currencySymbol} ${invoice.finalAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+      <td style="text-align: right;">${invoice.currencySymbol} ${invoice.finalAmount.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
     </tr>
   </table>
 
