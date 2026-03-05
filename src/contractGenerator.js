@@ -314,86 +314,88 @@ export const generateContract = async (formData, downloadFormat = 'doc') => {
   if (downloadFormat === 'pdf') {
     try {
       const arrayBuffer = await blob.arrayBuffer()
-      const result = await mammoth.convertToHtml({ arrayBuffer })
+      const result = await mammoth.convertToHtml({
+        arrayBuffer,
+        styleMap: [
+          "p[style-name='Normal'] => p:fresh",
+          "p[style-name='Heading 1'] => h1:fresh",
+          "p[style-name='Heading 2'] => h2:fresh",
+          "b => strong"
+        ]
+      })
       const htmlContent = result.value
 
-      const tempDiv = document.createElement('div')
-      tempDiv.style.width = '210mm'
-      tempDiv.style.padding = '25.4mm'
-      tempDiv.style.margin = '0 auto'
-      tempDiv.style.backgroundColor = 'white'
-      tempDiv.style.fontFamily = 'Calibri, Arial, sans-serif'
-      tempDiv.style.fontSize = '12pt'
-      tempDiv.style.lineHeight = '1.15'
-      tempDiv.style.color = '#000000'
+      const tempContainer = document.createElement('div')
+      tempContainer.style.position = 'fixed'
+      tempContainer.style.left = '0'
+      tempContainer.style.top = '0'
+      tempContainer.style.width = '794px'
+      tempContainer.style.backgroundColor = 'white'
+      tempContainer.style.padding = '96px'
+      tempContainer.style.boxSizing = 'border-box'
+      tempContainer.style.fontFamily = 'Calibri, Arial, sans-serif'
+      tempContainer.style.fontSize = '11pt'
+      tempContainer.style.lineHeight = '1.3'
+      tempContainer.style.color = '#000000'
+      tempContainer.style.zIndex = '9999'
 
       const styledHtml = `
         <style>
+          * { margin: 0; padding: 0; box-sizing: border-box; }
           p {
-            margin: 0 0 8pt 0;
-            padding: 0;
+            margin: 0 0 10pt 0;
             text-align: justify;
+            line-height: 1.3;
           }
           h1, h2, h3, h4, h5, h6 {
             margin: 12pt 0 8pt 0;
-            padding: 0;
             font-weight: bold;
+            line-height: 1.2;
           }
-          strong, b {
-            font-weight: bold;
-          }
-          table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 8pt 0;
-          }
-          table td, table th {
-            border: 1px solid #000;
-            padding: 8px;
-          }
+          h1 { font-size: 14pt; }
+          strong, b { font-weight: bold; }
           ul, ol {
-            margin: 0 0 8pt 0;
-            padding-left: 48px;
+            margin: 8pt 0;
+            padding-left: 40px;
           }
           li {
-            margin: 0 0 8pt 0;
+            margin: 4pt 0;
+            line-height: 1.3;
           }
         </style>
         ${htmlContent}
       `
 
-      tempDiv.innerHTML = styledHtml
-      document.body.appendChild(tempDiv)
+      tempContainer.innerHTML = styledHtml
+      document.body.appendChild(tempContainer)
+
+      await new Promise(resolve => setTimeout(resolve, 500))
 
       const opt = {
-        margin: [25.4, 25.4, 25.4, 25.4],
+        margin: [25, 25, 25, 25],
         filename: `${fileName}.pdf`,
-        image: {
-          type: 'jpeg',
-          quality: 0.98
-        },
+        image: { type: 'jpeg', quality: 0.95 },
         html2canvas: {
           scale: 2,
-          logging: true,
           useCORS: true,
-          letterRendering: true,
+          logging: false,
+          windowWidth: 794,
+          windowHeight: 1123,
           backgroundColor: '#ffffff'
         },
         jsPDF: {
           unit: 'mm',
           format: 'a4',
-          orientation: 'portrait'
+          orientation: 'portrait',
+          compress: true
         },
-        pagebreak: {
-          mode: ['avoid-all', 'css'],
-          avoid: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'table', 'ul', 'ol', 'li']
-        }
+        pagebreak: { mode: 'avoid-all' }
       }
 
-      await html2pdf().set(opt).from(tempDiv).save()
+      await html2pdf().set(opt).from(tempContainer).save()
 
-      if (document.body.contains(tempDiv)) {
-        document.body.removeChild(tempDiv)
+      if (document.body.contains(tempContainer)) {
+        document.body.removeChild(tempContainer)
       }
     } catch (error) {
       console.error('PDF generation error:', error)
