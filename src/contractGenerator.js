@@ -1,7 +1,7 @@
 import PizZip from 'pizzip'
 import { saveAs } from 'file-saver'
 
-export const generateContract = async (formData, downloadFormat = 'doc') => {
+export const generateContract = async (formData) => {
   console.log('=== FORM DATA RECEIVED ===')
   console.log(JSON.stringify(formData, null, 2))
 
@@ -308,36 +308,5 @@ export const generateContract = async (formData, downloadFormat = 'doc') => {
   })
 
   const fileName = `contract_${formData.playerName?.replace(/\s+/g, '_') || 'player'}`
-
-  if (downloadFormat === 'pdf') {
-    try {
-      const formDataToSend = new FormData()
-      formDataToSend.append('file', blob, `${fileName}.docx`)
-
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
-
-      const response = await fetch(`${supabaseUrl}/functions/v1/convert-to-pdf`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${supabaseAnonKey}`
-        },
-        body: formDataToSend
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'PDF conversion failed')
-      }
-
-      const pdfBlob = await response.blob()
-      saveAs(pdfBlob, `${fileName}.pdf`)
-    } catch (error) {
-      console.error('PDF conversion error:', error)
-      alert('PDF dönüştürme başarısız oldu. DOCX olarak indiriliyor.')
-      saveAs(blob, `${fileName}.docx`)
-    }
-  } else {
-    saveAs(blob, `${fileName}.docx`)
-  }
+  saveAs(blob, `${fileName}.docx`)
 }

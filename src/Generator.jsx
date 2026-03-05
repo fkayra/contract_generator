@@ -70,7 +70,6 @@ function Generator({ onNavigate, editingContract, editingInvoice }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [downloadFormat, setDownloadFormat] = useState('doc');
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -261,7 +260,7 @@ function Generator({ onNavigate, editingContract, editingInvoice }) {
 
     try {
       await saveToDatabase(formData);
-      await generateContract(formData, downloadFormat);
+      await generateContract(formData);
       setSuccess('Contract generated successfully!');
       setShowInvoice(true);
     } catch (err) {
@@ -894,30 +893,6 @@ function Generator({ onNavigate, editingContract, editingInvoice }) {
 
           {error && <div className="alert alert-error">{error}</div>}
           {success && <div className="alert alert-success">{success}</div>}
-
-          <div style={{ marginBottom: '20px' }}>
-            <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Download Format:</label>
-            <div style={{ display: 'flex', gap: '15px' }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                <input
-                  type="radio"
-                  value="doc"
-                  checked={downloadFormat === 'doc'}
-                  onChange={(e) => setDownloadFormat(e.target.value)}
-                />
-                DOC
-              </label>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                <input
-                  type="radio"
-                  value="pdf"
-                  checked={downloadFormat === 'pdf'}
-                  onChange={(e) => setDownloadFormat(e.target.value)}
-                />
-                PDF
-              </label>
-            </div>
-          </div>
 
           <button type="submit" className="btn-submit" disabled={loading}>
             {loading ? 'Generating...' : 'Generate Contract'}
