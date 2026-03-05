@@ -28,13 +28,11 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    const GOOGLE_CLIENT_ID = Deno.env.get("GOOGLE_CLIENT_ID");
-    const GOOGLE_CLIENT_SECRET = Deno.env.get("GOOGLE_CLIENT_SECRET");
-    const GOOGLE_REFRESH_TOKEN = Deno.env.get("GOOGLE_REFRESH_TOKEN");
+    const CLOUDCONVERT_API_KEY = Deno.env.get("CLOUDCONVERT_API_KEY");
 
-    if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET || !GOOGLE_REFRESH_TOKEN) {
+    if (!CLOUDCONVERT_API_KEY) {
       return new Response(
-        JSON.stringify({ error: "Google API credentials not configured" }),
+        JSON.stringify({ error: "CloudConvert API key not configured" }),
         {
           status: 500,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -42,95 +40,96 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
+    const docxBuffer = await docxFile.arrayBuffer();
+    const base64Docx = btoa(String.fromCharCode(...new Uint8Array(docxBuffer)));
+
+    const jobResponse = await fetch("https://api.cloudconvert.com/v2/jobs", {
       method: "POST",
       headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
+        "Authorization": `Bearer ${CLOUDCONVERT_API_KEY}`,
+        "Content-Type": "application/json",
       },
-      body: new URLSearchParams({
-        client_id: GOOGLE_CLIENT_ID,
-        client_secret: GOOGLE_CLIENT_SECRET,
-        refresh_token: GOOGLE_REFRESH_TOKEN,
-        grant_type: "refresh_token",
+      body: JSON.stringify({
+        tasks: {
+          "import-docx": {
+            operation: "import/base64",
+            file: base64Docx,
+            filename: docxFile.name,
+          },
+          "convert-to-pdf": {
+            operation: "convert",
+            input: "import-docx",
+            output_format: "pdf",
+          },
+          "export-pdf": {
+            operation: "export/url",
+            input: "convert-to-pdf",
+          },
+        },
       }),
     });
 
-    if (!tokenResponse.ok) {
-      throw new Error("Failed to get access token");
+    if (!jobResponse.ok) {
+      const errorText = await jobResponse.text();
+      throw new Error(`CloudConvert job creation failed: ${errorText}`);
     }
 
-    const tokenData = await tokenResponse.json();
-    const accessToken = tokenData.access_token;
+    const jobData = await jobResponse.json();
+    const jobId = jobData.data.id;
 
-    const docxBuffer = await docxFile.arrayBuffer();
-    const boundary = "-------314159265358979323846";
-    const delimiter = "\r\n--" + boundary + "\r\n";
-    const closeDelimiter = "\r\n--" + boundary + "--";
+    let jobStatus = jobData.data.status;
+    let attempts = 0;
+    const maxAttempts = 30;
 
-    const metadata = {
-      name: docxFile.name,
-      mimeType: "application/vnd.google-apps.document",
-    };
+    while (jobStatus !== "finished" && jobStatus !== "error" && attempts < maxAttempts) {
+      await new Promise((resolve) => setTimeout(resolve, 2000));
 
-    const multipartRequestBody =
-      delimiter +
-      "Content-Type: application/json\r\n\r\n" +
-      JSON.stringify(metadata) +
-      delimiter +
-      "Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document\r\n" +
-      "Content-Transfer-Encoding: base64\r\n\r\n" +
-      btoa(String.fromCharCode(...new Uint8Array(docxBuffer))) +
-      closeDelimiter;
-
-    const uploadResponse = await fetch(
-      "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart",
-      {
-        method: "POST",
+      const statusResponse = await fetch(`https://api.cloudconvert.com/v2/jobs/${jobId}`, {
         headers: {
-          "Authorization": `Bearer ${accessToken}`,
-          "Content-Type": `multipart/related; boundary="${boundary}"`,
+          "Authorization": `Bearer ${CLOUDCONVERT_API_KEY}`,
         },
-        body: multipartRequestBody,
-      }
-    );
+      });
 
-    if (!uploadResponse.ok) {
-      const errorText = await uploadResponse.text();
-      throw new Error(`Failed to upload to Google Drive: ${errorText}`);
+      if (!statusResponse.ok) {
+        throw new Error("Failed to check job status");
+      }
+
+      const statusData = await statusResponse.json();
+      jobStatus = statusData.data.status;
+      attempts++;
+
+      if (jobStatus === "finished") {
+        const exportTask = statusData.data.tasks.find((t: any) => t.name === "export-pdf");
+        if (exportTask && exportTask.result && exportTask.result.files && exportTask.result.files.length > 0) {
+          const pdfUrl = exportTask.result.files[0].url;
+
+          const pdfResponse = await fetch(pdfUrl);
+          if (!pdfResponse.ok) {
+            throw new Error("Failed to download PDF");
+          }
+
+          const pdfBuffer = await pdfResponse.arrayBuffer();
+
+          return new Response(pdfBuffer, {
+            headers: {
+              ...corsHeaders,
+              "Content-Type": "application/pdf",
+              "Content-Disposition": `attachment; filename="${docxFile.name.replace('.docx', '.pdf')}"`,
+            },
+          });
+        }
+      }
     }
 
-    const uploadData = await uploadResponse.json();
-    const fileId = uploadData.id;
-
-    const exportResponse = await fetch(
-      `https://www.googleapis.com/drive/v3/files/${fileId}/export?mimeType=application/pdf`,
-      {
-        headers: {
-          "Authorization": `Bearer ${accessToken}`,
-        },
-      }
-    );
-
-    if (!exportResponse.ok) {
-      throw new Error("Failed to export PDF from Google Drive");
+    if (jobStatus === "error") {
+      throw new Error("CloudConvert job failed");
     }
 
-    const pdfBuffer = await exportResponse.arrayBuffer();
+    if (attempts >= maxAttempts) {
+      throw new Error("Conversion timeout");
+    }
 
-    await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}`, {
-      method: "DELETE",
-      headers: {
-        "Authorization": `Bearer ${accessToken}`,
-      },
-    });
-
-    return new Response(pdfBuffer, {
-      headers: {
-        ...corsHeaders,
-        "Content-Type": "application/pdf",
-        "Content-Disposition": `attachment; filename="${docxFile.name.replace('.docx', '.pdf')}"`,
-      },
-    });
+    throw new Error("Unexpected error in conversion process");
 
   } catch (error) {
     console.error("Error:", error);
