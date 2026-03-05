@@ -323,19 +323,32 @@ export const generateContract = async (formData, downloadFormat = 'doc') => {
 <head>
   <meta charset="UTF-8">
   <style>
+    @page {
+      size: A4;
+      margin: 20mm;
+    }
     body {
       font-family: Arial, sans-serif;
-      padding: 40px;
       font-size: 11pt;
       line-height: 1.5;
+      margin: 0;
+      padding: 0;
     }
     p {
       margin: 10px 0;
+      page-break-inside: avoid;
+      orphans: 3;
+      widows: 3;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      page-break-after: avoid;
+      page-break-inside: avoid;
     }
     table {
       width: 100%;
       border-collapse: collapse;
       margin: 15px 0;
+      page-break-inside: avoid;
     }
     table td, table th {
       border: 1px solid #000;
@@ -343,6 +356,12 @@ export const generateContract = async (formData, downloadFormat = 'doc') => {
     }
     strong, b {
       font-weight: bold;
+    }
+    ul, ol {
+      page-break-inside: avoid;
+    }
+    li {
+      page-break-inside: avoid;
     }
   </style>
 </head>
@@ -357,15 +376,27 @@ export const generateContract = async (formData, downloadFormat = 'doc') => {
       document.body.appendChild(tempDiv)
 
       const opt = {
-        margin: [15, 15, 15, 15],
+        margin: [20, 20, 20, 20],
         filename: `${fileName}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: {
           scale: 2,
           logging: false,
-          useCORS: true
+          useCORS: true,
+          letterRendering: true
         },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        jsPDF: {
+          unit: 'mm',
+          format: 'a4',
+          orientation: 'portrait',
+          compress: true
+        },
+        pagebreak: {
+          mode: ['avoid-all', 'css', 'legacy'],
+          before: '.page-break-before',
+          after: '.page-break-after',
+          avoid: ['p', 'table', 'ul', 'ol', 'li']
+        }
       }
 
       await html2pdf().set(opt).from(tempDiv).save()

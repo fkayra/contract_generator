@@ -42,7 +42,7 @@ export const generateInvoice = async (invoice, index, downloadFormat = 'doc') =>
   <style>
     @page {
       size: A4;
-      margin: 0;
+      margin: 15mm;
     }
     * {
       margin: 0;
@@ -51,9 +51,18 @@ export const generateInvoice = async (invoice, index, downloadFormat = 'doc') =>
     }
     body {
       font-family: Arial, sans-serif;
-      padding: 20px 30px;
+      padding: 0;
       font-size: 9pt;
       line-height: 1.2;
+    }
+    table {
+      page-break-inside: avoid;
+    }
+    tr {
+      page-break-inside: avoid;
+    }
+    div {
+      page-break-inside: avoid;
     }
   </style>
 </head>
@@ -135,15 +144,25 @@ export const generateInvoice = async (invoice, index, downloadFormat = 'doc') =>
     document.body.appendChild(tempDiv)
 
     const opt = {
-      margin: [10, 10, 10, 10],
+      margin: [15, 15, 15, 15],
       filename: `${baseFilename}.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: {
         scale: 2,
         logging: false,
-        useCORS: true
+        useCORS: true,
+        letterRendering: true
       },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      jsPDF: {
+        unit: 'mm',
+        format: 'a4',
+        orientation: 'portrait',
+        compress: true
+      },
+      pagebreak: {
+        mode: ['avoid-all', 'css', 'legacy'],
+        avoid: ['table', 'tr', 'div']
+      }
     }
 
     try {
