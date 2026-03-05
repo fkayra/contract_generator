@@ -1,7 +1,9 @@
 import PizZip from 'pizzip'
 import { saveAs } from 'file-saver'
+import mammoth from 'mammoth'
+import html2pdf from 'html2pdf.js'
 
-export const generateContract = async (formData) => {
+export const generateContract = async (formData, downloadFormat = 'doc') => {
   console.log('=== FORM DATA RECEIVED ===')
   console.log(JSON.stringify(formData, null, 2))
 
@@ -309,5 +311,74 @@ export const generateContract = async (formData) => {
 
   const fileName = `contract_${formData.playerName?.replace(/\s+/g, '_') || 'player'}`
 
-  saveAs(blob, `${fileName}.docx`)
+  if (downloadFormat === 'pdf') {
+    try {
+      const arrayBuffer = await blob.arrayBuffer()
+      const result = await mammoth.convertToHtml({ arrayBuffer })
+      const htmlContent = result.value
+
+      const styledHtml = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 40px;
+      font-size: 11pt;
+      line-height: 1.5;
+    }
+    p {
+      margin: 10px 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 15px 0;
+    }
+    table td, table th {
+      border: 1px solid #000;
+      padding: 8px;
+    }
+    strong, b {
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  ${htmlContent}
+</body>
+</html>
+      `
+
+      const tempDiv = document.createElement('div')
+      tempDiv.innerHTML = styledHtml
+      document.body.appendChild(tempDiv)
+
+      const opt = {
+        margin: [15, 15, 15, 15],
+        filename: `${fileName}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: {
+          scale: 2,
+          logging: false,
+          useCORS: true
+        },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      }
+
+      await html2pdf().set(opt).from(tempDiv).save()
+
+      if (document.body.contains(tempDiv)) {
+        document.body.removeChild(tempDiv)
+      }
+    } catch (error) {
+      console.error('PDF generation error:', error)
+      alert('PDF generation failed. Downloading as DOCX instead.')
+      saveAs(blob, `${fileName}.docx`)
+    }
+  } else {
+    saveAs(blob, `${fileName}.docx`)
+  }
 }
