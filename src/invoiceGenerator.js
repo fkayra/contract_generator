@@ -44,96 +44,22 @@ export const generateInvoice = async (invoice, index, downloadFormat = 'doc') =>
       size: A4;
       margin: 0;
     }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
     body {
       font-family: Arial, sans-serif;
-      margin: 20px 30px;
+      padding: 20px 30px;
       font-size: 9pt;
-      line-height: 1.1;
-    }
-    .header {
-      text-align: center;
-      margin-bottom: 10px;
-    }
-    .company-info {
-      font-weight: bold;
-      line-height: 1.1;
-      font-size: 9pt;
-    }
-    .date {
-      text-align: right;
-      margin-bottom: 8px;
-      font-size: 9pt;
-    }
-    .client-info-table {
-      width: 60%;
-      border-collapse: collapse;
-      margin-bottom: 10px;
-    }
-    .client-info-table td {
-      border: 1px solid #000;
-      padding: 2px 5px;
-      vertical-align: top;
-      font-size: 9pt;
-      line-height: 1.1;
-    }
-    .client-info-table td:first-child {
-      width: 70px;
-      font-weight: bold;
-      white-space: nowrap;
-    }
-    .client-info-table td:last-child {
-      word-wrap: break-word;
-      word-break: normal;
-    }
-    .invoice-title {
-      font-size: 11pt;
-      font-weight: bold;
-      margin: 8px 0;
-      text-align: center;
-    }
-    .invoice-table {
-      width: 85%;
-      border-collapse: collapse;
-      margin: 10px 0;
-    }
-    .invoice-table td {
-      border: 1px solid #000;
-      padding: 2px 5px;
-      font-size: 9pt;
-      line-height: 1.1;
-    }
-    .invoice-table .header-row td {
-      font-weight: bold;
-      text-align: center;
-    }
-    .invoice-table .amount-col {
-      width: 100px;
-      text-align: right;
-    }
-    .invoice-table .total-row {
-      font-weight: bold;
-    }
-    .payment-info {
-      margin-top: 10px;
-      line-height: 1.1;
-      font-size: 8pt;
-    }
-    .payment-info p {
-      margin: 0.5px 0;
-    }
-    .spacing {
-      margin: 15px 0;
-    }
-    hr {
-      border: none;
-      border-top: 2px solid #000;
-      margin: 10px 0;
+      line-height: 1.2;
     }
   </style>
 </head>
 <body>
-  <div class="header">
-    <div class="company-info">
+  <div style="text-align: center; margin-bottom: 10px;">
+    <div style="font-weight: bold; line-height: 1.2; font-size: 9pt;">
       ${invoice.company.name}<br>
       ${invoice.company.address.replace(/\n/g, '<br>')}<br>
       ${invoice.company.fax ? `${invoice.company.fax}<br>` : ''}
@@ -142,60 +68,56 @@ export const generateInvoice = async (invoice, index, downloadFormat = 'doc') =>
     </div>
   </div>
 
-  <hr>
+  <hr style="border: none; border-top: 2px solid #000; margin: 10px 0;">
 
-  <div class="date">${invoice.date}</div>
+  <div style="text-align: right; margin-bottom: 10px; font-size: 9pt;">${invoice.date}</div>
 
-  <table class="client-info-table">
+  <table style="width: 60%; border-collapse: collapse; margin-bottom: 10px; border: 1px solid #000;">
     <tr>
-      <td>Name</td>
-      <td>${invoice.clubName}</td>
+      <td style="border: 1px solid #000; padding: 3px 5px; font-weight: bold; width: 80px; font-size: 9pt; vertical-align: top;">Name</td>
+      <td style="border: 1px solid #000; padding: 3px 5px; font-size: 9pt; vertical-align: top;">${invoice.clubName}</td>
     </tr>
     <tr>
-      <td>Address</td>
-      <td>${invoice.clubAddress}</td>
+      <td style="border: 1px solid #000; padding: 3px 5px; font-weight: bold; font-size: 9pt; vertical-align: top;">Address</td>
+      <td style="border: 1px solid #000; padding: 3px 5px; font-size: 9pt; vertical-align: top;">${invoice.clubAddress}</td>
     </tr>
     <tr>
-      <td>Country</td>
-      <td>${invoice.teamCountry}</td>
+      <td style="border: 1px solid #000; padding: 3px 5px; font-weight: bold; font-size: 9pt; vertical-align: top;">Country</td>
+      <td style="border: 1px solid #000; padding: 3px 5px; font-size: 9pt; vertical-align: top;">${invoice.teamCountry}</td>
     </tr>
     <tr>
-      <td>VAT<br>Number</td>
-      <td>${invoice.taxInfo || ''}</td>
+      <td style="border: 1px solid #000; padding: 3px 5px; font-weight: bold; font-size: 9pt; vertical-align: top;">VAT<br>Number</td>
+      <td style="border: 1px solid #000; padding: 3px 5px; font-size: 9pt; vertical-align: top;">${invoice.taxInfo || ''}</td>
     </tr>
   </table>
 
-  <div class="invoice-title">
+  <div style="font-size: 11pt; font-weight: bold; margin: 10px 0; text-align: center;">
     Invoice ${String(index + 1).padStart(3, '0')}
   </div>
 
-  <table class="invoice-table">
-    <tr class="header-row">
-      <td><strong>PROJECT DESCRIPTION</strong></td>
-      <td class="amount-col"><strong>${invoice.currency.toUpperCase()}</strong></td>
+  <table style="width: 85%; border-collapse: collapse; margin: 10px 0; border: 1px solid #000;">
+    <tr>
+      <td style="border: 1px solid #000; padding: 3px 5px; font-weight: bold; text-align: center; font-size: 9pt;">PROJECT DESCRIPTION</td>
+      <td style="border: 1px solid #000; padding: 3px 5px; font-weight: bold; text-align: center; width: 100px; font-size: 9pt;">${invoice.currency.toUpperCase()}</td>
     </tr>
     <tr>
-      <td>Agency fee ${invoice.playerName || ''}</td>
-      <td class="amount-col">${formatNumber(invoice.amount)}</td>
+      <td style="border: 1px solid #000; padding: 3px 5px; font-size: 9pt;">Agency fee ${invoice.playerName || ''}</td>
+      <td style="border: 1px solid #000; padding: 3px 5px; text-align: right; font-size: 9pt;">${formatNumber(invoice.amount)}</td>
     </tr>
     <tr>
-      <td>VAT (${invoice.includeVAT === 'yes' ? '19' : '0'}%)</td>
-      <td class="amount-col">${invoice.includeVAT === 'yes' ? formatNumber(invoice.vatAmount) : ''}</td>
+      <td style="border: 1px solid #000; padding: 3px 5px; font-size: 9pt;">VAT (${invoice.includeVAT === 'yes' ? '19' : '0'}%)</td>
+      <td style="border: 1px solid #000; padding: 3px 5px; text-align: right; font-size: 9pt;">${invoice.includeVAT === 'yes' ? formatNumber(invoice.vatAmount) : ''}</td>
     </tr>
-    <tr class="total-row">
-      <td><strong>Total: ${invoice.amountInWords}</strong></td>
-      <td class="amount-col"><strong>${invoice.currencySymbol}${formatNumber(invoice.finalAmount)}</strong></td>
+    <tr>
+      <td style="border: 1px solid #000; padding: 3px 5px; font-weight: bold; font-size: 9pt;">Total: ${invoice.amountInWords}</td>
+      <td style="border: 1px solid #000; padding: 3px 5px; text-align: right; font-weight: bold; font-size: 9pt;">${invoice.currencySymbol}${formatNumber(invoice.finalAmount)}</td>
     </tr>
   </table>
 
-  <div class="spacing"></div>
-  <div class="spacing"></div>
-  <div class="spacing"></div>
-
-  <div class="payment-info">
-    <p><strong>Payment : Through Bank Transfer to the following Account</strong></p>
-    <p><strong>${invoice.bankAccount.title}</strong></p>
-    ${renderBankAccountDetails(invoice.bankAccount)}
+  <div style="margin-top: 30px; line-height: 1.3; font-size: 8pt;">
+    <p style="margin: 2px 0;"><strong>Payment : Through Bank Transfer to the following Account</strong></p>
+    <p style="margin: 2px 0;"><strong>${invoice.bankAccount.title}</strong></p>
+    ${renderBankAccountDetails(invoice.bankAccount).replace(/<p>/g, '<p style="margin: 2px 0;">')}
   </div>
 
 </body>
