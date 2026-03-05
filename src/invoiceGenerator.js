@@ -45,7 +45,7 @@ export const generateInvoice = (invoice, index) => {
       font-family: Arial, sans-serif;
       margin: 25px 40px;
       font-size: 11pt;
-      line-height: 1.2;
+      line-height: 1;
     }
     .header {
       text-align: center;
@@ -53,7 +53,7 @@ export const generateInvoice = (invoice, index) => {
     }
     .company-info {
       font-weight: bold;
-      line-height: 1.25;
+      line-height: 1;
       font-size: 11pt;
     }
     .date {
@@ -71,7 +71,7 @@ export const generateInvoice = (invoice, index) => {
       padding: 3px 8px;
       vertical-align: top;
       font-size: 11pt;
-      line-height: 1.1;
+      line-height: 1;
     }
     .client-info-table td:first-child {
       width: 85px;
@@ -97,7 +97,7 @@ export const generateInvoice = (invoice, index) => {
       border: 1px solid #000;
       padding: 3px 8px;
       font-size: 11pt;
-      line-height: 1.1;
+      line-height: 1;
     }
     .invoice-table .header-row td {
       font-weight: bold;
@@ -112,7 +112,7 @@ export const generateInvoice = (invoice, index) => {
     }
     .payment-info {
       margin-top: 15px;
-      line-height: 1.3;
+      line-height: 1;
       font-size: 10pt;
     }
     .payment-info p {
