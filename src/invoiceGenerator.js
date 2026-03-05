@@ -1,7 +1,9 @@
 import { saveAs } from 'file-saver'
 import html2pdf from 'html2pdf.js'
 
-export const generateInvoice = (invoice, index, downloadFormat = 'doc') => {
+export const generateInvoice = async (invoice, index, downloadFormat = 'doc') => {
+  console.log('Generating invoice:', { invoice, index, downloadFormat })
+
   const renderBankAccountDetails = (bankAccount) => {
     if (bankAccount.beneficiaryName) {
       return `
@@ -202,24 +204,45 @@ export const generateInvoice = (invoice, index, downloadFormat = 'doc') => {
 
   const baseFilename = `Invoice_${invoice.company.name.replace(/ /g, '_')}_${invoice.date.replace(/\//g, '-')}_${index + 1}`
 
+  console.log('HTML content length:', htmlContent.length)
+  console.log('First 500 chars of HTML:', htmlContent.substring(0, 500))
+
   if (downloadFormat === 'pdf') {
     const tempDiv = document.createElement('div')
     tempDiv.innerHTML = htmlContent
     tempDiv.style.position = 'absolute'
     tempDiv.style.left = '-9999px'
+    tempDiv.style.width = '210mm'
     document.body.appendChild(tempDiv)
+
+    console.log('tempDiv created and appended:', tempDiv.innerHTML.length)
+
+    await new Promise(resolve => setTimeout(resolve, 100))
 
     const opt = {
       margin: [10, 10, 10, 10],
       filename: `${baseFilename}.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true },
+      html2canvas: {
+        scale: 2,
+        useCORS: true,
+        logging: true,
+        letterRendering: true
+      },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     }
 
-    html2pdf().from(tempDiv).set(opt).save().then(() => {
-      document.body.removeChild(tempDiv)
-    })
+    try {
+      console.log('Starting PDF generation...')
+      await html2pdf().set(opt).from(tempDiv).save()
+      console.log('PDF generation completed')
+    } catch (error) {
+      console.error('PDF generation error:', error)
+    } finally {
+      if (document.body.contains(tempDiv)) {
+        document.body.removeChild(tempDiv)
+      }
+    }
   } else {
     const blob = new Blob(['\ufeff', htmlContent], {
       type: 'application/msword'
@@ -229,10 +252,11 @@ export const generateInvoice = (invoice, index, downloadFormat = 'doc') => {
   }
 }
 
-export const generateAllInvoices = (invoices, downloadFormat = 'doc') => {
-  invoices.forEach((invoice, index) => {
-    setTimeout(() => {
-      generateInvoice(invoice, index, downloadFormat)
-    }, index * 500)
-  })
+export const generateAllInvoices = async (invoices, downloadFormat = 'doc') => {
+  for (let index = 0; index < invoices.length; index++) {
+    await generateInvoice(invoices[index], index, downloadFormat)
+    if (index < invoices.length - 1) {
+      await new Promise(resolve => setTimeout(resolve, 500))
+    }
+  }
 }
