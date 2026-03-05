@@ -4,8 +4,7 @@ import { generateAllInvoices } from './invoiceGenerator'
 import { supabase } from './supabaseClient'
 
 function InvoiceForm({ formData, onBack, onNavigate, editingInvoice }) {
-  const [step, setStep] = useState(editingInvoice ? 5 : 1)
-  const [downloadFormat, setDownloadFormat] = useState('doc')
+  const [step, setStep] = useState(editingInvoice ? 6 : 1)
   const [invoiceData, setInvoiceData] = useState(editingInvoice ? editingInvoice.invoice_data.invoiceSettings : {
     company: '',
     bank: '',
@@ -18,7 +17,7 @@ function InvoiceForm({ formData, onBack, onNavigate, editingInvoice }) {
 
   useEffect(() => {
     if (editingInvoice) {
-      setStep(5);
+      setStep(6);
       setInvoiceData(editingInvoice.invoice_data.invoiceSettings);
       setInvoices(editingInvoice.invoice_data.invoices);
     }
@@ -209,7 +208,7 @@ function InvoiceForm({ formData, onBack, onNavigate, editingInvoice }) {
     })
 
     setInvoices(generatedInvoices)
-    setStep(5)
+    setStep(6)
   }
 
   const saveToDatabase = async () => {
@@ -250,7 +249,7 @@ function InvoiceForm({ formData, onBack, onNavigate, editingInvoice }) {
   };
 
   const downloadInvoices = async () => {
-    await generateAllInvoices(invoices, downloadFormat);
+    await generateAllInvoices(invoices);
     await saveToDatabase();
   }
 
@@ -406,7 +405,112 @@ function InvoiceForm({ formData, onBack, onNavigate, editingInvoice }) {
 
       {step === 5 && (
         <div>
-          <h1>Generated Invoices ({invoices.length})</h1>
+          <h1>Review and Edit Invoice Data</h1>
+
+          <section className="form-section">
+            <h2>Contract Information</h2>
+            <div className="form-grid">
+              <div className="form-group">
+                <label>Club Name</label>
+                <input
+                  type="text"
+                  value={formData.clubName}
+                  onChange={(e) => formData.clubName = e.target.value}
+                  readOnly
+                  style={{ backgroundColor: '#f5f5f5' }}
+                />
+              </div>
+              <div className="form-group">
+                <label>Club Address</label>
+                <input
+                  type="text"
+                  value={formData.clubAddress}
+                  readOnly
+                  style={{ backgroundColor: '#f5f5f5' }}
+                />
+              </div>
+              <div className="form-group">
+                <label>Team Country</label>
+                <input
+                  type="text"
+                  value={formData.teamCountry}
+                  readOnly
+                  style={{ backgroundColor: '#f5f5f5' }}
+                />
+              </div>
+              <div className="form-group">
+                <label>Tax Info</label>
+                <input
+                  type="text"
+                  value={formData.taxInfo}
+                  readOnly
+                  style={{ backgroundColor: '#f5f5f5' }}
+                />
+              </div>
+            </div>
+          </section>
+
+          <section className="form-section">
+            <h2>Invoice Settings</h2>
+            <div className="form-grid">
+              <div className="form-group">
+                <label>Company</label>
+                <p style={{ padding: '10px', backgroundColor: '#f5f5f5', borderRadius: '4px' }}>{invoiceData.company}</p>
+              </div>
+              <div className="form-group">
+                <label>Bank</label>
+                <p style={{ padding: '10px', backgroundColor: '#f5f5f5', borderRadius: '4px' }}>{invoiceData.bank}</p>
+              </div>
+              <div className="form-group">
+                <label>Currency</label>
+                <p style={{ padding: '10px', backgroundColor: '#f5f5f5', borderRadius: '4px' }}>{invoiceData.currency}</p>
+              </div>
+              <div className="form-group">
+                <label>VAT</label>
+                <p style={{ padding: '10px', backgroundColor: '#f5f5f5', borderRadius: '4px' }}>{invoiceData.includeVAT === 'yes' ? 'Yes (19%)' : 'No (0%)'}</p>
+              </div>
+              <div className="form-group">
+                <label>Invoice Number</label>
+                <p style={{ padding: '10px', backgroundColor: '#f5f5f5', borderRadius: '4px' }}>{invoiceData.invoiceNumber}</p>
+              </div>
+            </div>
+          </section>
+
+          <section className="form-section">
+            <h2>Payment Schedule</h2>
+            {formData.seasons.map((season, seasonIndex) => (
+              <div key={seasonIndex} style={{ marginBottom: '20px', padding: '15px', backgroundColor: '#f9f9f9', borderRadius: '4px' }}>
+                <h3>Season: {season.seasonName}</h3>
+                <div style={{ marginTop: '10px' }}>
+                  <h4>Agency Fee Payments</h4>
+                  {season.agencyFee.payments.map((payment, paymentIndex) => (
+                    payment.date && payment.amount && (
+                      <div key={paymentIndex} style={{ padding: '10px', marginBottom: '10px', backgroundColor: '#fff', border: '1px solid #ddd', borderRadius: '4px' }}>
+                        <p><strong>Payment {paymentIndex + 1}</strong></p>
+                        <p>Date: {payment.date}</p>
+                        <p>Amount: {payment.amount}</p>
+                      </div>
+                    )
+                  ))}
+                </div>
+              </div>
+            ))}
+          </section>
+
+          <div style={{ marginTop: '20px' }}>
+            <button onClick={generateInvoiceData} style={{ marginRight: '10px', padding: '15px 30px', fontSize: '16px' }}>
+              Generate Invoices
+            </button>
+            <button onClick={() => setStep(4)} style={{ padding: '15px 30px', fontSize: '16px' }}>
+              Back
+            </button>
+          </div>
+        </div>
+      )}
+
+      {step === 6 && (
+        <div>
+          <h1>Invoice Preview ({invoices.length})</h1>
 
           {invoices.map((invoice, index) => (
             <div key={index} style={{ border: '2px solid #333', padding: '20px', marginBottom: '20px', backgroundColor: '#f9f9f9' }}>
@@ -452,25 +556,12 @@ function InvoiceForm({ formData, onBack, onNavigate, editingInvoice }) {
             </div>
           ))}
 
-          <section className="form-section">
-            <h2>Download Options</h2>
-            <div className="form-grid">
-              <div className="form-group">
-                <label>Download As</label>
-                <select
-                  value={downloadFormat}
-                  onChange={(e) => setDownloadFormat(e.target.value)}
-                >
-                  <option value="doc">DOC</option>
-                  <option value="pdf">PDF</option>
-                </select>
-              </div>
-            </div>
-          </section>
-
           <div style={{ marginTop: '20px' }}>
             <button onClick={downloadInvoices} style={{ marginRight: '10px', padding: '15px 30px', fontSize: '16px' }}>
               Generate Invoices
+            </button>
+            <button onClick={() => setStep(5)} style={{ marginRight: '10px', padding: '15px 30px', fontSize: '16px' }}>
+              Back to Review
             </button>
             <button onClick={() => onNavigate('home')} style={{ padding: '15px 30px', fontSize: '16px' }}>
               Back to Home

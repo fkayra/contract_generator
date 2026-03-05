@@ -1,7 +1,7 @@
 import PizZip from 'pizzip'
 import { saveAs } from 'file-saver'
 
-export const generateContract = async (formData, downloadFormat = 'docx') => {
+export const generateContract = async (formData) => {
   console.log('=== FORM DATA RECEIVED ===')
   console.log(JSON.stringify(formData, null, 2))
 
@@ -308,14 +308,6 @@ export const generateContract = async (formData, downloadFormat = 'docx') => {
   })
 
   const fileName = `contract_${formData.playerName?.replace(/\s+/g, '_') || 'player'}`
-  const extension = downloadFormat === 'pdf' ? 'pdf' : 'docx'
 
-  if (downloadFormat === 'pdf') {
-    const docBlob = new Blob([blob], {
-      type: 'application/msword'
-    })
-    saveAs(docBlob, `${fileName}.doc`)
-  } else {
-    saveAs(blob, `${fileName}.${extension}`)
-  }
+  saveAs(blob, `${fileName}.docx`)
 }
