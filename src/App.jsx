@@ -46,6 +46,7 @@ function App() {
     numberOfTickets: '',
     numberOfBedrooms: '',
     numberOfDays: '',
+    includeNotClause: false,
     notClause: '',
     bonuses: [
       {
@@ -62,7 +63,8 @@ function App() {
   const [success, setSuccess] = useState('')
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target
+    const { name, value, type, checked } = e.target
+    const inputValue = type === 'checkbox' ? checked : value
 
     if (name === 'numberOfSeasons') {
       const numSeasons = parseInt(value) || 1
@@ -95,7 +97,7 @@ function App() {
         season2: newSeasons[1]?.seasonName || '2026/27'
       }))
     } else {
-      setFormData(prev => ({ ...prev, [name]: value }))
+      setFormData(prev => ({ ...prev, [name]: inputValue }))
     }
   }
 
@@ -738,14 +740,26 @@ function App() {
                 />
               </div>
               <div className="form-group full-width">
-                <label>NOT Clause</label>
-                <input
-                  type="text"
-                  name="notClause"
-                  value={formData.notClause}
-                  onChange={handleInputChange}
-                  placeholder="NOT clause"
-                />
+                <label>
+                  <input
+                    type="checkbox"
+                    name="includeNotClause"
+                    checked={formData.includeNotClause}
+                    onChange={handleInputChange}
+                    style={{ width: 'auto', marginRight: '8px' }}
+                  />
+                  Include NOT Clause
+                </label>
+                {formData.includeNotClause && (
+                  <input
+                    type="text"
+                    name="notClause"
+                    value={formData.notClause}
+                    onChange={handleInputChange}
+                    placeholder="Enter NOT clause text"
+                    style={{ marginTop: '8px' }}
+                  />
+                )}
               </div>
             </div>
           </section>

@@ -46,7 +46,7 @@ export const generateContract = async (formData) => {
   content = content.replace(/\[NUMBER OF DAYS\]/g, formData.numberOfDays || '')
   content = content.replace(/\[ACHIEVEMENT\]/g, formData.achievement || '')
   // [COMPETITION] will be replaced later with bonus XML
-  content = content.replace(/\[NOT\]/g, formData.notClause || '')
+  content = content.replace(/\[NOT\]/g, formData.includeNotClause ? formData.notClause || '' : '')
   // [ADDITIONAL_SEASON] will be replaced later with second season XML
 
   // Handle multi-season clause
