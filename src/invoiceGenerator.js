@@ -208,40 +208,24 @@ export const generateInvoice = async (invoice, index, downloadFormat = 'doc') =>
   console.log('First 500 chars of HTML:', htmlContent.substring(0, 500))
 
   if (downloadFormat === 'pdf') {
-    const tempDiv = document.createElement('div')
-    tempDiv.innerHTML = htmlContent
-    tempDiv.style.position = 'absolute'
-    tempDiv.style.left = '-9999px'
-    tempDiv.style.width = '210mm'
-    document.body.appendChild(tempDiv)
-
-    console.log('tempDiv created and appended:', tempDiv.innerHTML.length)
-
-    await new Promise(resolve => setTimeout(resolve, 100))
-
     const opt = {
       margin: [10, 10, 10, 10],
       filename: `${baseFilename}.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: {
         scale: 2,
-        useCORS: true,
-        logging: true,
-        letterRendering: true
+        logging: false
       },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     }
 
     try {
       console.log('Starting PDF generation...')
-      await html2pdf().set(opt).from(tempDiv).save()
+      await html2pdf().set(opt).from(htmlContent).save()
       console.log('PDF generation completed')
     } catch (error) {
       console.error('PDF generation error:', error)
-    } finally {
-      if (document.body.contains(tempDiv)) {
-        document.body.removeChild(tempDiv)
-      }
+      alert('PDF generation failed: ' + error.message)
     }
   } else {
     const blob = new Blob(['\ufeff', htmlContent], {
