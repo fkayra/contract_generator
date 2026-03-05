@@ -312,8 +312,32 @@ export const generateContract = async (formData, downloadFormat = 'doc') => {
   const fileName = `contract_${formData.playerName?.replace(/\s+/g, '_') || 'player'}`
 
   if (downloadFormat === 'pdf') {
-    alert('PDF indirme özelliği şu an düzgün çalışmıyor.\n\nLütfen DOCX olarak indirin ve Microsoft Word veya LibreOffice ile "Save as PDF" / "PDF olarak kaydet" özelliğini kullanın.')
-    saveAs(blob, `${fileName}.docx`)
+    try {
+      const formData = new FormData()
+      formData.append('file', blob, `${fileName}.docx`)
+
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/convert-to-pdf`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+          body: formData
+        }
+      )
+
+      if (!response.ok) {
+        throw new Error('PDF conversion failed')
+      }
+
+      const pdfBlob = await response.blob()
+      saveAs(pdfBlob, `${fileName}.pdf`)
+    } catch (error) {
+      console.error('PDF conversion error:', error)
+      alert('PDF dönüştürme başarısız oldu. DOCX olarak indiriliyor.')
+      saveAs(blob, `${fileName}.docx`)
+    }
   } else {
     saveAs(blob, `${fileName}.docx`)
   }
