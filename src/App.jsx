@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import './App.css'
 import { generateContract } from './contractGenerator'
+import InvoiceForm from './InvoiceForm'
 
 function App() {
+  const [showInvoice, setShowInvoice] = useState(false)
   const [formData, setFormData] = useState({
     contractDate: '',
     clubName: '',
@@ -42,6 +44,7 @@ function App() {
     fibaLicence: '',
     signeeTitle: '',
     signeeName: '',
+    taxInfo: '',
     ticketClass: '',
     numberOfTickets: '',
     numberOfBedrooms: '',
@@ -223,6 +226,7 @@ function App() {
     try {
       await generateContract(formData)
       setSuccess('Contract generated successfully!')
+      setShowInvoice(true)
     } catch (err) {
       console.error('Contract generation error:', err)
       setError(err.message || 'Failed to generate contract')
@@ -247,6 +251,10 @@ function App() {
       console.error('Download failed:', error)
       alert('Dosya indirilemedi. Lütfen tekrar deneyin.')
     }
+  }
+
+  if (showInvoice) {
+    return <InvoiceForm formData={formData} onBack={() => setShowInvoice(false)} />
   }
 
   return (
@@ -672,6 +680,16 @@ function App() {
           <section className="form-section">
             <h2>Signee Information (for the Club)</h2>
             <div className="form-grid">
+              <div className="form-group">
+                <label>Tax Info</label>
+                <input
+                  type="text"
+                  name="taxInfo"
+                  value={formData.taxInfo}
+                  onChange={handleInputChange}
+                  placeholder="e.g., SARIYER VERGI DAIRESI 2700863000"
+                />
+              </div>
               <div className="form-group">
                 <label>Signee Title</label>
                 <input
