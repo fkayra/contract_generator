@@ -1,17 +1,26 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './App.css'
 import { generateAllInvoices } from './invoiceGenerator'
+import { supabase } from './supabaseClient'
 
-function InvoiceForm({ formData, onBack }) {
-  const [step, setStep] = useState(1)
-  const [invoiceData, setInvoiceData] = useState({
+function InvoiceForm({ formData, onBack, onNavigate, editingInvoice }) {
+  const [step, setStep] = useState(editingInvoice ? 5 : 1)
+  const [invoiceData, setInvoiceData] = useState(editingInvoice ? editingInvoice.invoice_data.invoiceSettings : {
     company: '',
     bank: '',
     currency: '',
     includeVAT: 'no'
   })
 
-  const [invoices, setInvoices] = useState([])
+  const [invoices, setInvoices] = useState(editingInvoice ? editingInvoice.invoice_data.invoices : [])
+
+  useEffect(() => {
+    if (editingInvoice) {
+      setStep(5);
+      setInvoiceData(editingInvoice.invoice_data.invoiceSettings);
+      setInvoices(editingInvoice.invoice_data.invoices);
+    }
+  }, [editingInvoice])
 
   const companyInfo = {
     'Nsi Management Ltd': {
@@ -201,8 +210,46 @@ function InvoiceForm({ formData, onBack }) {
     setStep(5)
   }
 
-  const downloadInvoices = () => {
-    generateAllInvoices(invoices)
+  const saveToDatabase = async () => {
+    try {
+      const invoiceId = editingInvoice?.id;
+      const firstInvoice = invoices[0];
+
+      const dataToSave = {
+        client_name: firstInvoice.clubName,
+        invoice_number: `INV-${Date.now()}`,
+        invoice_data: {
+          invoiceSettings: invoiceData,
+          invoices: invoices,
+          formData: formData
+        }
+      };
+
+      if (invoiceId) {
+        const { error } = await supabase
+          .from('invoices')
+          .update({
+            ...dataToSave,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', invoiceId);
+
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from('invoices')
+          .insert(dataToSave);
+
+        if (error) throw error;
+      }
+    } catch (error) {
+      console.error('Error saving to database:', error);
+    }
+  };
+
+  const downloadInvoices = async () => {
+    await generateAllInvoices(invoices);
+    await saveToDatabase();
   }
 
   const renderBankAccountDetails = (bankAccount) => {
@@ -250,7 +297,9 @@ function InvoiceForm({ formData, onBack }) {
               SBM INTL LTD
             </button>
           </div>
-          <button onClick={onBack} style={{ marginTop: '20px' }}>Back to Contract</button>
+          <button onClick={onBack} style={{ marginTop: '20px' }}>
+            {editingInvoice ? 'Back to Invoice List' : 'Back to Contract'}
+          </button>
         </div>
       )}
 
