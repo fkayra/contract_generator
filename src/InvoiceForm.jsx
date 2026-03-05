@@ -5,6 +5,7 @@ import { supabase } from './supabaseClient'
 
 function InvoiceForm({ formData, onBack, onNavigate, editingInvoice }) {
   const [step, setStep] = useState(editingInvoice ? 6 : 1)
+  const [downloadFormat, setDownloadFormat] = useState('doc')
   const [invoiceData, setInvoiceData] = useState(editingInvoice ? editingInvoice.invoice_data.invoiceSettings : {
     company: '',
     bank: '',
@@ -249,7 +250,7 @@ function InvoiceForm({ formData, onBack, onNavigate, editingInvoice }) {
   };
 
   const downloadInvoices = async () => {
-    await generateAllInvoices(invoices);
+    await generateAllInvoices(invoices, downloadFormat);
     await saveToDatabase();
   }
 
@@ -555,6 +556,22 @@ function InvoiceForm({ formData, onBack, onNavigate, editingInvoice }) {
               </div>
             </div>
           ))}
+
+          <section className="form-section">
+            <h2>Download Options</h2>
+            <div className="form-grid">
+              <div className="form-group">
+                <label>Download As</label>
+                <select
+                  value={downloadFormat}
+                  onChange={(e) => setDownloadFormat(e.target.value)}
+                >
+                  <option value="doc">DOC</option>
+                  <option value="pdf">PDF</option>
+                </select>
+              </div>
+            </div>
+          </section>
 
           <div style={{ marginTop: '20px' }}>
             <button onClick={downloadInvoices} style={{ marginRight: '10px', padding: '15px 30px', fontSize: '16px' }}>

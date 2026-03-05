@@ -1,6 +1,7 @@
 import { saveAs } from 'file-saver'
+import html2pdf from 'html2pdf.js'
 
-export const generateInvoice = (invoice, index) => {
+export const generateInvoice = (invoice, index, downloadFormat = 'doc') => {
   const renderBankAccountDetails = (bankAccount) => {
     if (bankAccount.beneficiaryName) {
       return `
@@ -194,17 +195,37 @@ export const generateInvoice = (invoice, index) => {
 
   const baseFilename = `Invoice_${invoice.company.name.replace(/ /g, '_')}_${invoice.date.replace(/\//g, '-')}_${index + 1}`
 
-  const blob = new Blob(['\ufeff', htmlContent], {
-    type: 'application/msword'
-  })
+  if (downloadFormat === 'pdf') {
+    const tempDiv = document.createElement('div')
+    tempDiv.innerHTML = htmlContent
+    tempDiv.style.position = 'absolute'
+    tempDiv.style.left = '-9999px'
+    document.body.appendChild(tempDiv)
 
-  saveAs(blob, `${baseFilename}.doc`)
+    const opt = {
+      margin: [10, 10, 10, 10],
+      filename: `${baseFilename}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    }
+
+    html2pdf().from(tempDiv).set(opt).save().then(() => {
+      document.body.removeChild(tempDiv)
+    })
+  } else {
+    const blob = new Blob(['\ufeff', htmlContent], {
+      type: 'application/msword'
+    })
+
+    saveAs(blob, `${baseFilename}.doc`)
+  }
 }
 
-export const generateAllInvoices = (invoices) => {
+export const generateAllInvoices = (invoices, downloadFormat = 'doc') => {
   invoices.forEach((invoice, index) => {
     setTimeout(() => {
-      generateInvoice(invoice, index)
+      generateInvoice(invoice, index, downloadFormat)
     }, index * 500)
   })
 }
