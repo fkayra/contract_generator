@@ -28,43 +28,111 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    const docxBuffer = await docxFile.arrayBuffer();
-    const inputPath = `/tmp/input_${Date.now()}.docx`;
-    const outputPath = `/tmp/output_${Date.now()}.pdf`;
+    const CLOUDCONVERT_API_KEY = Deno.env.get("CLOUDCONVERT_API_KEY");
 
-    await Deno.writeFile(inputPath, new Uint8Array(docxBuffer));
-
-    const command = new Deno.Command("libreoffice", {
-      args: [
-        "--headless",
-        "--convert-to",
-        "pdf",
-        "--outdir",
-        "/tmp",
-        inputPath,
-      ],
-    });
-
-    const { code, stderr } = await command.output();
-
-    if (code !== 0) {
-      const errorText = new TextDecoder().decode(stderr);
-      throw new Error(`LibreOffice conversion failed: ${errorText}`);
+    if (!CLOUDCONVERT_API_KEY) {
+      return new Response(
+        JSON.stringify({ error: "CloudConvert API key not configured" }),
+        {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
     }
 
-    const expectedOutputPath = inputPath.replace('.docx', '.pdf');
-    const pdfBuffer = await Deno.readFile(expectedOutputPath);
+    const docxBuffer = await docxFile.arrayBuffer();
+    const base64Docx = btoa(
+      String.fromCharCode(...new Uint8Array(docxBuffer))
+    );
 
-    await Deno.remove(inputPath);
-    await Deno.remove(expectedOutputPath);
-
-    return new Response(pdfBuffer, {
+    const jobResponse = await fetch("https://api.cloudconvert.com/v2/jobs", {
+      method: "POST",
       headers: {
-        ...corsHeaders,
-        "Content-Type": "application/pdf",
-        "Content-Disposition": `attachment; filename="${docxFile.name.replace('.docx', '.pdf')}"`,
+        "Authorization": `Bearer ${CLOUDCONVERT_API_KEY}`,
+        "Content-Type": "application/json",
       },
+      body: JSON.stringify({
+        tasks: {
+          "import-docx": {
+            operation: "import/base64",
+            file: base64Docx,
+            filename: docxFile.name,
+          },
+          "convert-to-pdf": {
+            operation: "convert",
+            input: "import-docx",
+            output_format: "pdf",
+          },
+          "export-pdf": {
+            operation: "export/url",
+            input: "convert-to-pdf",
+          },
+        },
+      }),
     });
+
+    if (!jobResponse.ok) {
+      const errorData = await jobResponse.text();
+      throw new Error(`CloudConvert job creation failed: ${errorData}`);
+    }
+
+    const jobData = await jobResponse.json();
+    const jobId = jobData.data.id;
+
+    let jobStatus = jobData.data.status;
+    let attempts = 0;
+    const maxAttempts = 30;
+
+    while (jobStatus !== "finished" && jobStatus !== "error" && attempts < maxAttempts) {
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      const statusResponse = await fetch(`https://api.cloudconvert.com/v2/jobs/${jobId}`, {
+        headers: {
+          "Authorization": `Bearer ${CLOUDCONVERT_API_KEY}`,
+        },
+      });
+
+      if (!statusResponse.ok) {
+        throw new Error("Failed to check job status");
+      }
+
+      const statusData = await statusResponse.json();
+      jobStatus = statusData.data.status;
+      attempts++;
+
+      if (jobStatus === "finished") {
+        const exportTask = statusData.data.tasks.find((t: any) => t.name === "export-pdf");
+        if (exportTask && exportTask.result && exportTask.result.files && exportTask.result.files[0]) {
+          const pdfUrl = exportTask.result.files[0].url;
+
+          const pdfResponse = await fetch(pdfUrl);
+          if (!pdfResponse.ok) {
+            throw new Error("Failed to download PDF");
+          }
+
+          const pdfBuffer = await pdfResponse.arrayBuffer();
+
+          return new Response(pdfBuffer, {
+            headers: {
+              ...corsHeaders,
+              "Content-Type": "application/pdf",
+              "Content-Disposition": `attachment; filename="${docxFile.name.replace('.docx', '.pdf')}"`,
+            },
+          });
+        }
+      }
+    }
+
+    if (jobStatus === "error") {
+      throw new Error("CloudConvert job failed");
+    }
+
+    if (attempts >= maxAttempts) {
+      throw new Error("Conversion timeout");
+    }
+
+    throw new Error("Unexpected job status");
+
   } catch (error) {
     console.error("Error:", error);
     return new Response(
