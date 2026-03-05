@@ -1,6 +1,6 @@
 import { saveAs } from 'file-saver'
 
-export const generateInvoice = (invoice, index) => {
+export const generateInvoice = (invoice, index, downloadFormat = 'doc') => {
   const renderBankAccountDetails = (bankAccount) => {
     if (bankAccount.beneficiaryName) {
       return `
@@ -200,22 +200,26 @@ export const generateInvoice = (invoice, index) => {
 </html>
   `
 
-  // Create blob with HTML content in Word format
-  const blob = new Blob(['\ufeff', htmlContent], {
-    type: 'application/msword'
-  })
+  // Create blob based on format
+  const baseFilename = `Invoice_${invoice.company.name.replace(/ /g, '_')}_${invoice.date.replace(/\//g, '-')}_${index + 1}`
 
-  // Generate filename with date
-  const filename = `Invoice_${invoice.company.name.replace(/ /g, '_')}_${invoice.date.replace(/\//g, '-')}_${index + 1}.doc`
-
-  // Save file
-  saveAs(blob, filename)
+  if (downloadFormat === 'pdf') {
+    const blob = new Blob([htmlContent], {
+      type: 'application/pdf'
+    })
+    saveAs(blob, `${baseFilename}.pdf`)
+  } else {
+    const blob = new Blob(['\ufeff', htmlContent], {
+      type: 'application/msword'
+    })
+    saveAs(blob, `${baseFilename}.doc`)
+  }
 }
 
-export const generateAllInvoices = (invoices) => {
+export const generateAllInvoices = (invoices, downloadFormat = 'doc') => {
   invoices.forEach((invoice, index) => {
     setTimeout(() => {
-      generateInvoice(invoice, index)
-    }, index * 500) // Delay each download by 500ms to avoid browser blocking
+      generateInvoice(invoice, index, downloadFormat)
+    }, index * 500)
   })
 }

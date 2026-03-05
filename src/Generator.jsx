@@ -5,10 +5,14 @@ import InvoiceForm from './InvoiceForm';
 import { supabase } from './supabaseClient';
 
 function Generator({ onNavigate, editingContract, editingInvoice }) {
-  const [showInvoice, setShowInvoice] = useState(false);
+  const [showInvoice, setShowInvoice] = useState(editingInvoice ? true : false);
+  const [downloadFormat, setDownloadFormat] = useState('docx');
   const [formData, setFormData] = useState(editingContract ? {
     ...editingContract.contract_data,
     _id: editingContract.id
+  } : editingInvoice ? {
+    ...editingInvoice.invoice_data.formData,
+    _invoiceId: editingInvoice.id
   } : {
     contractDate: '',
     clubName: '',
@@ -256,7 +260,7 @@ function Generator({ onNavigate, editingContract, editingInvoice }) {
     setSuccess('');
 
     try {
-      await generateContract(formData);
+      await generateContract(formData, downloadFormat);
       await saveToDatabase(formData);
       setSuccess('Contract generated successfully!');
       setShowInvoice(true);
@@ -890,6 +894,22 @@ function Generator({ onNavigate, editingContract, editingInvoice }) {
 
           {error && <div className="alert alert-error">{error}</div>}
           {success && <div className="alert alert-success">{success}</div>}
+
+          <section className="form-section">
+            <h2>Download Options</h2>
+            <div className="form-grid">
+              <div className="form-group">
+                <label>Download As</label>
+                <select
+                  value={downloadFormat}
+                  onChange={(e) => setDownloadFormat(e.target.value)}
+                >
+                  <option value="docx">DOCX</option>
+                  <option value="pdf">PDF</option>
+                </select>
+              </div>
+            </div>
+          </section>
 
           <button type="submit" className="btn-submit" disabled={loading}>
             {loading ? 'Generating...' : 'Generate Contract'}
