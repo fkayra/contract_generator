@@ -357,6 +357,16 @@ function App() {
                   placeholder="Country name"
                 />
               </div>
+              <div className="form-group">
+                <label>VAT Number</label>
+                <input
+                  type="text"
+                  name="taxInfo"
+                  value={formData.taxInfo}
+                  onChange={handleInputChange}
+                  placeholder="e.g., SARIYER VERGI DAIRESI 2700863000"
+                />
+              </div>
             </div>
           </section>
 
@@ -680,16 +690,6 @@ function App() {
           <section className="form-section">
             <h2>Signee Information (for the Club)</h2>
             <div className="form-grid">
-              <div className="form-group">
-                <label>Tax Info</label>
-                <input
-                  type="text"
-                  name="taxInfo"
-                  value={formData.taxInfo}
-                  onChange={handleInputChange}
-                  placeholder="e.g., SARIYER VERGI DAIRESI 2700863000"
-                />
-              </div>
               <div className="form-group">
                 <label>Signee Title</label>
                 <input
