@@ -313,26 +313,28 @@ export const generateContract = async (formData, downloadFormat = 'doc') => {
 
   if (downloadFormat === 'pdf') {
     try {
-      const formData = new FormData()
-      formData.append('file', blob, `${fileName}.docx`)
+      const arrayBuffer = await blob.arrayBuffer()
+      const result = await mammoth.convertToHtml({ arrayBuffer })
+      const html = result.value
 
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/convert-to-pdf`,
-        {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-          },
-          body: formData
-        }
-      )
+      const element = document.createElement('div')
+      element.innerHTML = html
+      element.style.padding = '40px'
+      element.style.fontFamily = 'Arial, sans-serif'
+      element.style.fontSize = '12pt'
+      element.style.lineHeight = '1.6'
+      element.style.maxWidth = '800px'
+      element.style.margin = '0 auto'
 
-      if (!response.ok) {
-        throw new Error('PDF conversion failed')
+      const opt = {
+        margin: [15, 15, 15, 15],
+        filename: `${fileName}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
       }
 
-      const pdfBlob = await response.blob()
-      saveAs(pdfBlob, `${fileName}.pdf`)
+      await html2pdf().set(opt).from(element).save()
     } catch (error) {
       console.error('PDF conversion error:', error)
       alert('PDF dönüştürme başarısız oldu. DOCX olarak indiriliyor.')
