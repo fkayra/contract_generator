@@ -28,60 +28,35 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    const GOOGLE_API_KEY = Deno.env.get("GOOGLE_API_KEY");
-
-    if (!GOOGLE_API_KEY) {
-      return new Response(
-        JSON.stringify({ error: "Google API key not configured" }),
-        {
-          status: 500,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
-      );
-    }
-
     const docxBuffer = await docxFile.arrayBuffer();
-    const base64Docx = btoa(
-      new Uint8Array(docxBuffer).reduce((data, byte) => data + String.fromCharCode(byte), '')
-    );
+    const inputPath = `/tmp/input_${Date.now()}.docx`;
+    const outputPath = `/tmp/output_${Date.now()}.pdf`;
 
-    const uploadResponse = await fetch(
-      `https://www.googleapis.com/upload/drive/v3/files?uploadType=media&key=${GOOGLE_API_KEY}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        },
-        body: new Uint8Array(docxBuffer),
-      }
-    );
+    await Deno.writeFile(inputPath, new Uint8Array(docxBuffer));
 
-    if (!uploadResponse.ok) {
-      throw new Error("Failed to upload to Google Drive");
+    const command = new Deno.Command("libreoffice", {
+      args: [
+        "--headless",
+        "--convert-to",
+        "pdf",
+        "--outdir",
+        "/tmp",
+        inputPath,
+      ],
+    });
+
+    const { code, stderr } = await command.output();
+
+    if (code !== 0) {
+      const errorText = new TextDecoder().decode(stderr);
+      throw new Error(`LibreOffice conversion failed: ${errorText}`);
     }
 
-    const uploadData = await uploadResponse.json();
-    const fileId = uploadData.id;
+    const expectedOutputPath = inputPath.replace('.docx', '.pdf');
+    const pdfBuffer = await Deno.readFile(expectedOutputPath);
 
-    const exportResponse = await fetch(
-      `https://www.googleapis.com/drive/v3/files/${fileId}/export?mimeType=application/pdf&key=${GOOGLE_API_KEY}`,
-      {
-        method: "GET",
-      }
-    );
-
-    if (!exportResponse.ok) {
-      throw new Error("Failed to export PDF");
-    }
-
-    const pdfBuffer = await exportResponse.arrayBuffer();
-
-    await fetch(
-      `https://www.googleapis.com/drive/v3/files/${fileId}?key=${GOOGLE_API_KEY}`,
-      {
-        method: "DELETE",
-      }
-    );
+    await Deno.remove(inputPath);
+    await Deno.remove(expectedOutputPath);
 
     return new Response(pdfBuffer, {
       headers: {
