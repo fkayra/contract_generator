@@ -747,7 +747,7 @@ function App() {
                     onChange={handleInputChange}
                     style={{ width: 'auto', marginRight: '8px' }}
                   />
-                  Include NOT Clause
+                  Bonuses are NOT cumulative
                 </label>
               </div>
             </div>
