@@ -119,6 +119,9 @@ export const generateInvoice = (invoice, index, downloadFormat = 'doc') => {
     .payment-info p {
       margin: 0.5px 0;
     }
+    .spacing {
+      margin: 15px 0;
+    }
     hr {
       border: none;
       border-top: 2px solid #000;
@@ -131,8 +134,8 @@ export const generateInvoice = (invoice, index, downloadFormat = 'doc') => {
     <div class="company-info">
       ${invoice.company.name}<br>
       ${invoice.company.address.replace(/\n/g, '<br>')}<br>
-      ${invoice.company.fax ? `Fax No. ${invoice.company.fax}<br>` : ''}
-      TAX ID#: ${invoice.company.taxId || invoice.company.vatNumber}<br>
+      ${invoice.company.fax ? `${invoice.company.fax}<br>` : ''}
+      ${invoice.company.taxId || invoice.company.vatNumber}<br>
       ${invoice.company.name}
     </div>
   </div>
@@ -182,6 +185,10 @@ export const generateInvoice = (invoice, index, downloadFormat = 'doc') => {
       <td class="amount-col"><strong>${invoice.currencySymbol}${formatNumber(invoice.finalAmount)}</strong></td>
     </tr>
   </table>
+
+  <div class="spacing"></div>
+  <div class="spacing"></div>
+  <div class="spacing"></div>
 
   <div class="payment-info">
     <p><strong>Payment : Through Bank Transfer to the following Account</strong></p>

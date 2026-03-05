@@ -250,8 +250,8 @@ function InvoiceForm({ formData, onBack, onNavigate, editingInvoice }) {
   };
 
   const downloadInvoices = async () => {
-    await generateAllInvoices(invoices, downloadFormat);
     await saveToDatabase();
+    await generateAllInvoices(invoices, downloadFormat);
   }
 
   const renderBankAccountDetails = (bankAccount) => {

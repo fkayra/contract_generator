@@ -70,6 +70,7 @@ function Generator({ onNavigate, editingContract, editingInvoice }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [downloadFormat, setDownloadFormat] = useState('docx');
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -259,8 +260,8 @@ function Generator({ onNavigate, editingContract, editingInvoice }) {
     setSuccess('');
 
     try {
-      await generateContract(formData);
       await saveToDatabase(formData);
+      await generateContract(formData, downloadFormat);
       setSuccess('Contract generated successfully!');
       setShowInvoice(true);
     } catch (err) {
@@ -889,6 +890,22 @@ function Generator({ onNavigate, editingContract, editingInvoice }) {
             >
               + Add Competition
             </button>
+          </section>
+
+          <section className="form-section">
+            <h2>Download Options</h2>
+            <div className="form-grid">
+              <div className="form-group">
+                <label>Download As</label>
+                <select
+                  value={downloadFormat}
+                  onChange={(e) => setDownloadFormat(e.target.value)}
+                >
+                  <option value="docx">DOCX</option>
+                  <option value="pdf">PDF</option>
+                </select>
+              </div>
+            </div>
           </section>
 
           {error && <div className="alert alert-error">{error}</div>}
