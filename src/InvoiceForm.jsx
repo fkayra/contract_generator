@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './App.css'
+import { generateAllInvoices } from './invoiceGenerator'
 
 function InvoiceForm({ formData, onBack }) {
   const [step, setStep] = useState(1)
@@ -192,7 +193,7 @@ function InvoiceForm({ formData, onBack }) {
   }
 
   const downloadInvoices = () => {
-    alert('Invoice download functionality will be implemented with Word template generation')
+    generateAllInvoices(invoices)
   }
 
   const renderBankAccountDetails = (bankAccount) => {
