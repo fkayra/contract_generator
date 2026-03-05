@@ -23,6 +23,14 @@ export const generateInvoice = (invoice, index) => {
     }
   }
 
+  const formatNumber = (num) => {
+    return num.toLocaleString('en-US', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 3,
+      useGrouping: true
+    }).replace(/,/g, '.')
+  }
+
   const htmlContent = `
 <!DOCTYPE html>
 <html>
@@ -33,109 +41,142 @@ export const generateInvoice = (invoice, index) => {
       font-family: Arial, sans-serif;
       margin: 40px;
       font-size: 11pt;
+      line-height: 1.3;
     }
     .header {
-      text-align: left;
-      margin-bottom: 30px;
+      text-align: center;
+      margin-bottom: 40px;
     }
     .company-info {
-      margin-bottom: 20px;
+      font-weight: bold;
+      line-height: 1.5;
     }
     .date {
       text-align: right;
-      margin-bottom: 20px;
-    }
-    .client-info {
       margin-bottom: 30px;
+    }
+    .client-info-table {
+      width: 70%;
+      border-collapse: collapse;
+      margin-bottom: 40px;
+    }
+    .client-info-table td {
       border: 1px solid #000;
-      padding: 15px;
+      padding: 8px 12px;
+      vertical-align: top;
+    }
+    .client-info-table td:first-child {
+      width: 80px;
+      font-weight: bold;
     }
     .invoice-title {
       font-size: 14pt;
       font-weight: bold;
-      margin: 20px 0;
+      margin: 30px 0;
+      text-align: center;
     }
-    .invoice-details {
-      margin: 20px 0;
-      border: 1px solid #000;
-      padding: 15px;
-    }
-    .payment-info {
-      margin-top: 30px;
-      border: 1px solid #000;
-      padding: 15px;
-    }
-    table {
+    .invoice-table {
       width: 100%;
       border-collapse: collapse;
-      margin: 20px 0;
+      margin: 30px 0;
     }
-    td {
-      padding: 8px;
+    .invoice-table td {
       border: 1px solid #000;
+      padding: 8px 12px;
     }
-    .total-row {
+    .invoice-table .header-row td {
       font-weight: bold;
-      font-size: 12pt;
+      text-align: center;
     }
-    p {
-      margin: 5px 0;
+    .invoice-table .amount-col {
+      width: 150px;
+      text-align: right;
+    }
+    .invoice-table .total-row {
+      font-weight: bold;
+    }
+    .payment-info {
+      margin-top: 40px;
+      line-height: 1.6;
+    }
+    .payment-info p {
+      margin: 4px 0;
+    }
+    hr {
+      border: none;
+      border-top: 2px solid #000;
+      margin: 20px 0;
     }
   </style>
 </head>
 <body>
   <div class="header">
     <div class="company-info">
-      <strong>${invoice.company.name}</strong><br>
+      ${invoice.company.name}<br>
       ${invoice.company.address.replace(/\n/g, '<br>')}<br>
-      ${invoice.company.fax || ''}<br>
-      ${invoice.company.taxId || invoice.company.vatNumber}
+      ${invoice.company.fax ? `Fax No. ${invoice.company.fax}<br>` : ''}
+      TAX ID#: ${invoice.company.taxId || invoice.company.vatNumber}<br>
+      ${invoice.company.name}
     </div>
   </div>
 
-  <div class="date">
-    <strong>${invoice.date}</strong>
-  </div>
+  <hr>
 
-  <div class="client-info">
-    <p><strong>Name:</strong> ${invoice.clubName}</p>
-    <p><strong>Address:</strong> ${invoice.clubAddress}</p>
-    <p><strong>Country:</strong> ${invoice.teamCountry}</p>
-    ${invoice.taxInfo ? `<p><strong>Tax Info:</strong> ${invoice.taxInfo}</p>` : ''}
-  </div>
+  <div class="date">${invoice.date}</div>
+
+  <table class="client-info-table">
+    <tr>
+      <td><strong>Name</strong></td>
+      <td>${invoice.clubName}</td>
+    </tr>
+    <tr>
+      <td><strong>Address</strong></td>
+      <td>${invoice.clubAddress}</td>
+    </tr>
+    <tr>
+      <td><strong>Country</strong></td>
+      <td>${invoice.teamCountry}</td>
+    </tr>
+    <tr>
+      <td><strong>VAT<br>Number</strong></td>
+      <td>${invoice.taxInfo || ''}</td>
+    </tr>
+  </table>
 
   <div class="invoice-title">
-    Invoice #${String(index + 1).padStart(3, '0')}
+    Invoice ${String(index + 1).padStart(3, '0')}
   </div>
 
-  <table>
-    <tr>
-      <td width="70%"><strong>PROJECT DESCRIPTION</strong></td>
-      <td width="30%" style="text-align: right;"><strong>${invoice.currency.toUpperCase()}</strong></td>
+  <table class="invoice-table">
+    <tr class="header-row">
+      <td><strong>PROJECT DESCRIPTION</strong></td>
+      <td class="amount-col"><strong>${invoice.currency.toUpperCase()}</strong></td>
     </tr>
     <tr>
-      <td>Professional services for basketball agency</td>
-      <td style="text-align: right;">${invoice.currencySymbol} ${invoice.amount.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+      <td>Agency fee ${invoice.playerName || ''}</td>
+      <td class="amount-col">${formatNumber(invoice.amount)}</td>
     </tr>
-    ${invoice.includeVAT === 'yes' ? `
     <tr>
-      <td>VAT (19%)</td>
-      <td style="text-align: right;">${invoice.currencySymbol} ${invoice.vatAmount.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+      <td>&nbsp;</td>
+      <td class="amount-col">&nbsp;</td>
     </tr>
-    ` : `
     <tr>
-      <td>VAT (0%)</td>
-      <td style="text-align: right;"></td>
+      <td>&nbsp;</td>
+      <td class="amount-col">&nbsp;</td>
     </tr>
-    `}
+    <tr>
+      <td>VAT (${invoice.includeVAT === 'yes' ? '19' : '0'}%)</td>
+      <td class="amount-col">${invoice.includeVAT === 'yes' ? formatNumber(invoice.vatAmount) : ''}</td>
+    </tr>
     <tr class="total-row">
-      <td>Total: ${invoice.amountInWords} ${invoice.currency}</td>
-      <td style="text-align: right;">${invoice.currencySymbol} ${invoice.finalAmount.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+      <td><strong>Total: ${invoice.amountInWords}</strong></td>
+      <td class="amount-col"><strong>${invoice.currencySymbol}${formatNumber(invoice.finalAmount)}</strong></td>
     </tr>
   </table>
 
   <div class="payment-info">
-    <p><strong>Payment: Through Bank Transfer to the following Account</strong></p>
+    <p><strong>Payment : Through Bank Transfer to the following Account</strong></p>
+    <p>&nbsp;</p>
     <p><strong>${invoice.bankAccount.title}</strong></p>
     ${renderBankAccountDetails(invoice.bankAccount)}
   </div>

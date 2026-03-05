@@ -165,26 +165,28 @@ function InvoiceForm({ formData, onBack }) {
           // Remove dots (thousand separator), replace comma with dot (decimal separator)
           numStr = numStr.replace(/\./g, '').replace(',', '.')
           const amount = parseFloat(numStr) || 0
-          let finalAmount = amount
+          let baseAmount = amount
           let vatAmount = 0
+          let totalAmount = amount
 
           if (invoiceData.includeVAT === 'yes') {
             vatAmount = amount * 0.19
-            finalAmount = amount - vatAmount
+            totalAmount = amount + vatAmount
           }
 
           const invoice = {
             date: payment.date,
-            amount: amount,
+            amount: baseAmount,
             vatAmount: vatAmount,
-            finalAmount: finalAmount,
-            amountInWords: numberToWords(Math.round(finalAmount)),
+            finalAmount: totalAmount,
+            amountInWords: numberToWords(Math.round(totalAmount)),
             company: companyInfo[invoiceData.company],
             bankAccount: getBankAccountInfo(),
             clubName: formData.clubName,
             clubAddress: formData.clubAddress,
             teamCountry: formData.teamCountry,
             taxInfo: formData.taxInfo,
+            playerName: season.playerName || '',
             currency: invoiceData.currency === 'EURO' ? 'Euro' : 'USD',
             currencySymbol: invoiceData.currency === 'EURO' ? '€' : '$',
             includeVAT: invoiceData.includeVAT
