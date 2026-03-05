@@ -317,79 +317,51 @@ export const generateContract = async (formData, downloadFormat = 'doc') => {
       const result = await mammoth.convertToHtml({ arrayBuffer })
       const htmlContent = result.value
 
+      const tempDiv = document.createElement('div')
+      tempDiv.style.width = '210mm'
+      tempDiv.style.padding = '25.4mm'
+      tempDiv.style.margin = '0 auto'
+      tempDiv.style.backgroundColor = 'white'
+      tempDiv.style.fontFamily = 'Calibri, Arial, sans-serif'
+      tempDiv.style.fontSize = '12pt'
+      tempDiv.style.lineHeight = '1.15'
+      tempDiv.style.color = '#000000'
+
       const styledHtml = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <style>
-    @page {
-      size: A4;
-      margin: 25.4mm 25.4mm 25.4mm 25.4mm;
-    }
-    * {
-      box-sizing: border-box;
-    }
-    body {
-      font-family: 'Calibri', Arial, sans-serif;
-      font-size: 12pt;
-      line-height: 1.15;
-      margin: 0;
-      padding: 0;
-      color: #000000;
-    }
-    p {
-      margin: 0 0 8pt 0;
-      padding: 0;
-      page-break-inside: avoid;
-      orphans: 2;
-      widows: 2;
-      text-align: justify;
-    }
-    h1, h2, h3, h4, h5, h6 {
-      page-break-after: avoid;
-      page-break-inside: avoid;
-      margin: 0;
-      padding: 0;
-      font-weight: bold;
-    }
-    strong, b {
-      font-weight: bold;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 0;
-      page-break-inside: avoid;
-      page-break-before: auto;
-      page-break-after: auto;
-    }
-    table td, table th {
-      border: 1px solid #000;
-      padding: 8px;
-      page-break-inside: avoid;
-    }
-    ul, ol {
-      margin: 0 0 8pt 0;
-      padding-left: 48px;
-      page-break-inside: avoid;
-    }
-    li {
-      margin: 0 0 8pt 0;
-      page-break-inside: avoid;
-    }
-    .avoid-break {
-      page-break-inside: avoid;
-    }
-  </style>
-</head>
-<body>
-  ${htmlContent}
-</body>
-</html>
+        <style>
+          p {
+            margin: 0 0 8pt 0;
+            padding: 0;
+            text-align: justify;
+          }
+          h1, h2, h3, h4, h5, h6 {
+            margin: 12pt 0 8pt 0;
+            padding: 0;
+            font-weight: bold;
+          }
+          strong, b {
+            font-weight: bold;
+          }
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 8pt 0;
+          }
+          table td, table th {
+            border: 1px solid #000;
+            padding: 8px;
+          }
+          ul, ol {
+            margin: 0 0 8pt 0;
+            padding-left: 48px;
+          }
+          li {
+            margin: 0 0 8pt 0;
+          }
+        </style>
+        ${htmlContent}
       `
 
-      const tempDiv = document.createElement('div')
       tempDiv.innerHTML = styledHtml
       document.body.appendChild(tempDiv)
 
@@ -402,24 +374,19 @@ export const generateContract = async (formData, downloadFormat = 'doc') => {
         },
         html2canvas: {
           scale: 2,
-          logging: false,
+          logging: true,
           useCORS: true,
           letterRendering: true,
-          windowWidth: 794,
-          windowHeight: 1123
+          backgroundColor: '#ffffff'
         },
         jsPDF: {
           unit: 'mm',
           format: 'a4',
-          orientation: 'portrait',
-          compress: true,
-          putOnlyUsedFonts: true
+          orientation: 'portrait'
         },
         pagebreak: {
-          mode: ['avoid-all', 'css', 'legacy'],
-          before: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
-          after: [],
-          avoid: ['p', 'table', 'ul', 'ol', 'li', 'tr', 'td', 'th', '.avoid-break']
+          mode: ['avoid-all', 'css'],
+          avoid: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'table', 'ul', 'ol', 'li']
         }
       }
 
