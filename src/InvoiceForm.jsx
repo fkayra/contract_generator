@@ -157,10 +157,14 @@ function InvoiceForm({ formData, onBack }) {
     formData.seasons.forEach((season) => {
       season.agencyFee.payments.forEach((payment) => {
         if (payment.date && payment.amount) {
-          // Parse Turkish number format: 31.620 or 31.620,50
+          // Parse number: remove all non-numeric except dots and commas
+          // Then remove dots (thousand separator), replace comma with dot (decimal separator)
+          let numStr = payment.amount.toString().trim()
+          // Remove currency symbols and spaces
+          numStr = numStr.replace(/[€$\s]/g, '')
           // Remove dots (thousand separator), replace comma with dot (decimal separator)
-          const cleanAmount = payment.amount.toString().replace(/\./g, '').replace(',', '.')
-          const amount = parseFloat(cleanAmount)
+          numStr = numStr.replace(/\./g, '').replace(',', '.')
+          const amount = parseFloat(numStr) || 0
           let finalAmount = amount
           let vatAmount = 0
 
