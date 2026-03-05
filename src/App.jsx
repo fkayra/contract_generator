@@ -47,7 +47,6 @@ function App() {
     numberOfBedrooms: '',
     numberOfDays: '',
     includeNotClause: false,
-    notClause: '',
     bonuses: [
       {
         competitionName: '',
@@ -750,16 +749,6 @@ function App() {
                   />
                   Include NOT Clause
                 </label>
-                {formData.includeNotClause && (
-                  <input
-                    type="text"
-                    name="notClause"
-                    value={formData.notClause}
-                    onChange={handleInputChange}
-                    placeholder="Enter NOT clause text"
-                    style={{ marginTop: '8px' }}
-                  />
-                )}
               </div>
             </div>
           </section>
