@@ -43,34 +43,35 @@ export const generateInvoice = (invoice, index) => {
     }
     body {
       font-family: Arial, sans-serif;
-      margin: 20px 30px;
-      font-size: 9pt;
-      line-height: 1.15;
+      margin: 25px 40px;
+      font-size: 11pt;
+      line-height: 1.2;
     }
     .header {
       text-align: center;
-      margin-bottom: 12px;
+      margin-bottom: 15px;
     }
     .company-info {
       font-weight: bold;
-      line-height: 1.2;
-      font-size: 9pt;
+      line-height: 1.25;
+      font-size: 11pt;
     }
     .date {
       text-align: right;
-      margin-bottom: 10px;
-      font-size: 9pt;
+      margin-bottom: 12px;
+      font-size: 11pt;
     }
     .client-info-table {
       width: 70%;
       border-collapse: collapse;
-      margin-bottom: 12px;
+      margin-bottom: 15px;
     }
     .client-info-table td {
       border: 1px solid #000;
-      padding: 4px 8px;
+      padding: 3px 8px;
       vertical-align: top;
-      font-size: 9pt;
+      font-size: 11pt;
+      line-height: 1.1;
     }
     .client-info-table td:first-child {
       width: 85px;
@@ -82,20 +83,21 @@ export const generateInvoice = (invoice, index) => {
       word-break: normal;
     }
     .invoice-title {
-      font-size: 12pt;
+      font-size: 14pt;
       font-weight: bold;
-      margin: 10px 0;
+      margin: 12px 0;
       text-align: center;
     }
     .invoice-table {
       width: 100%;
       border-collapse: collapse;
-      margin: 10px 0;
+      margin: 12px 0;
     }
     .invoice-table td {
       border: 1px solid #000;
-      padding: 4px 8px;
-      font-size: 9pt;
+      padding: 3px 8px;
+      font-size: 11pt;
+      line-height: 1.1;
     }
     .invoice-table .header-row td {
       font-weight: bold;
@@ -109,9 +111,9 @@ export const generateInvoice = (invoice, index) => {
       font-weight: bold;
     }
     .payment-info {
-      margin-top: 12px;
-      line-height: 1.25;
-      font-size: 8.5pt;
+      margin-top: 15px;
+      line-height: 1.3;
+      font-size: 10pt;
     }
     .payment-info p {
       margin: 1px 0;
@@ -119,7 +121,7 @@ export const generateInvoice = (invoice, index) => {
     hr {
       border: none;
       border-top: 2px solid #000;
-      margin: 8px 0;
+      margin: 10px 0;
     }
   </style>
 </head>
