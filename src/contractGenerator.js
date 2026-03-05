@@ -325,42 +325,60 @@ export const generateContract = async (formData, downloadFormat = 'doc') => {
   <style>
     @page {
       size: A4;
-      margin: 20mm;
+      margin: 25.4mm 25.4mm 25.4mm 25.4mm;
+    }
+    * {
+      box-sizing: border-box;
     }
     body {
-      font-family: Arial, sans-serif;
-      font-size: 11pt;
-      line-height: 1.5;
+      font-family: 'Calibri', Arial, sans-serif;
+      font-size: 12pt;
+      line-height: 1.15;
       margin: 0;
       padding: 0;
+      color: #000000;
     }
     p {
-      margin: 10px 0;
+      margin: 0 0 8pt 0;
+      padding: 0;
       page-break-inside: avoid;
-      orphans: 3;
-      widows: 3;
+      orphans: 2;
+      widows: 2;
+      text-align: justify;
     }
     h1, h2, h3, h4, h5, h6 {
       page-break-after: avoid;
       page-break-inside: avoid;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 15px 0;
-      page-break-inside: avoid;
-    }
-    table td, table th {
-      border: 1px solid #000;
-      padding: 8px;
+      margin: 0;
+      padding: 0;
+      font-weight: bold;
     }
     strong, b {
       font-weight: bold;
     }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0;
+      page-break-inside: avoid;
+      page-break-before: auto;
+      page-break-after: auto;
+    }
+    table td, table th {
+      border: 1px solid #000;
+      padding: 8px;
+      page-break-inside: avoid;
+    }
     ul, ol {
+      margin: 0 0 8pt 0;
+      padding-left: 48px;
       page-break-inside: avoid;
     }
     li {
+      margin: 0 0 8pt 0;
+      page-break-inside: avoid;
+    }
+    .avoid-break {
       page-break-inside: avoid;
     }
   </style>
@@ -376,26 +394,32 @@ export const generateContract = async (formData, downloadFormat = 'doc') => {
       document.body.appendChild(tempDiv)
 
       const opt = {
-        margin: [20, 20, 20, 20],
+        margin: [25.4, 25.4, 25.4, 25.4],
         filename: `${fileName}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
+        image: {
+          type: 'jpeg',
+          quality: 0.98
+        },
         html2canvas: {
           scale: 2,
           logging: false,
           useCORS: true,
-          letterRendering: true
+          letterRendering: true,
+          windowWidth: 794,
+          windowHeight: 1123
         },
         jsPDF: {
           unit: 'mm',
           format: 'a4',
           orientation: 'portrait',
-          compress: true
+          compress: true,
+          putOnlyUsedFonts: true
         },
         pagebreak: {
           mode: ['avoid-all', 'css', 'legacy'],
-          before: '.page-break-before',
-          after: '.page-break-after',
-          avoid: ['p', 'table', 'ul', 'ol', 'li']
+          before: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
+          after: [],
+          avoid: ['p', 'table', 'ul', 'ol', 'li', 'tr', 'td', 'th', '.avoid-break']
         }
       }
 
