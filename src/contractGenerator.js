@@ -1,7 +1,5 @@
 import PizZip from 'pizzip'
 import { saveAs } from 'file-saver'
-import mammoth from 'mammoth'
-import html2pdf from 'html2pdf.js'
 
 export const generateContract = async (formData, downloadFormat = 'doc') => {
   console.log('=== FORM DATA RECEIVED ===')
@@ -313,28 +311,27 @@ export const generateContract = async (formData, downloadFormat = 'doc') => {
 
   if (downloadFormat === 'pdf') {
     try {
-      const arrayBuffer = await blob.arrayBuffer()
-      const result = await mammoth.convertToHtml({ arrayBuffer })
-      const html = result.value
+      const formDataToSend = new FormData()
+      formDataToSend.append('file', blob, `${fileName}.docx`)
 
-      const element = document.createElement('div')
-      element.innerHTML = html
-      element.style.padding = '40px'
-      element.style.fontFamily = 'Arial, sans-serif'
-      element.style.fontSize = '12pt'
-      element.style.lineHeight = '1.6'
-      element.style.maxWidth = '800px'
-      element.style.margin = '0 auto'
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
-      const opt = {
-        margin: [15, 15, 15, 15],
-        filename: `${fileName}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, letterRendering: true },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      const response = await fetch(`${supabaseUrl}/functions/v1/convert-to-pdf`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${supabaseAnonKey}`
+        },
+        body: formDataToSend
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'PDF conversion failed')
       }
 
-      await html2pdf().set(opt).from(element).save()
+      const pdfBlob = await response.blob()
+      saveAs(pdfBlob, `${fileName}.pdf`)
     } catch (error) {
       console.error('PDF conversion error:', error)
       alert('PDF dönüştürme başarısız oldu. DOCX olarak indiriliyor.')
