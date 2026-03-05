@@ -669,7 +669,7 @@ function App() {
           </section>
 
           <section className="form-section">
-            <h2>Signee Information</h2>
+            <h2>Signee Information (for the Club)</h2>
             <div className="form-grid">
               <div className="form-group">
                 <label>Signee Title</label>
