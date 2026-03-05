@@ -37,52 +37,65 @@ export const generateInvoice = (invoice, index) => {
 <head>
   <meta charset="UTF-8">
   <style>
+    @page {
+      size: A4;
+      margin: 0;
+    }
     body {
       font-family: Arial, sans-serif;
-      margin: 40px;
-      font-size: 11pt;
-      line-height: 1.3;
+      margin: 30px 40px;
+      font-size: 10pt;
+      line-height: 1.2;
     }
     .header {
       text-align: center;
-      margin-bottom: 40px;
+      margin-bottom: 25px;
     }
     .company-info {
       font-weight: bold;
-      line-height: 1.5;
+      line-height: 1.3;
+      font-size: 10pt;
     }
     .date {
       text-align: right;
-      margin-bottom: 30px;
+      margin-bottom: 20px;
+      font-size: 10pt;
     }
     .client-info-table {
       width: 70%;
       border-collapse: collapse;
-      margin-bottom: 40px;
+      margin-bottom: 25px;
     }
     .client-info-table td {
       border: 1px solid #000;
-      padding: 8px 12px;
+      padding: 6px 10px;
       vertical-align: top;
+      font-size: 10pt;
     }
     .client-info-table td:first-child {
-      width: 80px;
+      width: 90px;
       font-weight: bold;
+      white-space: nowrap;
+    }
+    .client-info-table td:last-child {
+      word-wrap: break-word;
+      word-break: normal;
     }
     .invoice-title {
-      font-size: 14pt;
+      font-size: 13pt;
       font-weight: bold;
-      margin: 30px 0;
+      margin: 20px 0;
       text-align: center;
     }
     .invoice-table {
       width: 100%;
       border-collapse: collapse;
-      margin: 30px 0;
+      margin: 20px 0;
     }
     .invoice-table td {
       border: 1px solid #000;
-      padding: 8px 12px;
+      padding: 6px 10px;
+      font-size: 10pt;
     }
     .invoice-table .header-row td {
       font-weight: bold;
@@ -96,16 +109,17 @@ export const generateInvoice = (invoice, index) => {
       font-weight: bold;
     }
     .payment-info {
-      margin-top: 40px;
-      line-height: 1.6;
+      margin-top: 25px;
+      line-height: 1.4;
+      font-size: 9.5pt;
     }
     .payment-info p {
-      margin: 4px 0;
+      margin: 2px 0;
     }
     hr {
       border: none;
       border-top: 2px solid #000;
-      margin: 20px 0;
+      margin: 15px 0;
     }
   </style>
 </head>
@@ -126,19 +140,19 @@ export const generateInvoice = (invoice, index) => {
 
   <table class="client-info-table">
     <tr>
-      <td><strong>Name</strong></td>
+      <td>Name</td>
       <td>${invoice.clubName}</td>
     </tr>
     <tr>
-      <td><strong>Address</strong></td>
+      <td>Address</td>
       <td>${invoice.clubAddress}</td>
     </tr>
     <tr>
-      <td><strong>Country</strong></td>
+      <td>Country</td>
       <td>${invoice.teamCountry}</td>
     </tr>
     <tr>
-      <td><strong>VAT<br>Number</strong></td>
+      <td>VAT<br>Number</td>
       <td>${invoice.taxInfo || ''}</td>
     </tr>
   </table>
