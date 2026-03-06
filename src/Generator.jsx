@@ -299,22 +299,38 @@ function Generator({ onNavigate, editingContract, editingInvoice }) {
         <header>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
             <h1>Basketball Contract Generator</h1>
-            <button onClick={() => onNavigate('home')} style={{ padding: '8px 16px' }}>Back to Home</button>
+            <button
+              onClick={() => onNavigate('home')}
+              style={{
+                padding: '0.625rem 1.25rem',
+                background: 'linear-gradient(135deg, #64748b 0%, #475569 100%)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '10px',
+                fontWeight: '700',
+                cursor: 'pointer',
+                fontSize: '0.875rem',
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                transition: 'all 0.2s ease',
+                letterSpacing: '0.3px'
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.15)';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)';
+              }}
+            >
+              Back to Home
+            </button>
           </div>
           <p>Fill in the contract details based on template</p>
           <button
             type="button"
             onClick={handleDownloadTemplate}
             className="btn-download"
-            style={{
-              marginTop: '10px',
-              padding: '8px 16px',
-              backgroundColor: '#4CAF50',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer'
-            }}
           >
             Download Template
           </button>
