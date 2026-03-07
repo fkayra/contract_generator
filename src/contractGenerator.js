@@ -33,6 +33,7 @@ export const generateContract = async (formData) => {
   content = content.replace(/\[TEAM BUY OUT AMOUNT\]/g, formData.teamBuyoutAmount || '')
   content = content.replace(/\[PLAYER BUY OUT AMOUNT\]/g, formData.playerBuyoutAmount || '')
   content = content.replace(/\[DATE OF THE BUY OUT\]/g, formData.buyoutDate || '')
+  content = content.replace(/\[NUMBER OF DAYS\]/g, formData.numberOfDaysBuyout || '')
   content = content.replace(/\[NAME OF THE AGENT\]/g, formData.agentName || '')
   content = content.replace(/\[NUMBER OF THE AGENT\]/g, formData.agentName || '')
   content = content.replace(/\[AND NAME OF THE OTHER AGENT\]/g, formData.otherAgentName || '')
@@ -298,6 +299,41 @@ export const generateContract = async (formData) => {
     // Match only the specific paragraph with paraId="0000004D" that contains [COMPETITION]
     const competitionRegex = /<w:p\s+[^>]*w14:paraId="0000004D"[^>]*>[\s\S]*?<\/w:p>/g
     content = content.replace(competitionRegex, bonusXML)
+  }
+
+  // Handle Buy-out section based on checkboxes
+  // Section starts with "9.1****       Buy-Outs:" and contains both Team and Player buy-out paragraphs
+  // We need to find and remove the paragraphs based on checkbox selection
+
+  // Team Buy-out starts with "Team Buy-out:" and Player Buy-out starts with "Player Buy-Out:"
+  // We need to remove the entire paragraph(s) if not selected
+
+  if (!formData.hasTeamBuyout && !formData.hasPlayerBuyout) {
+    // Remove entire buy-out section (9.1 and its content)
+    // Find paragraphs containing "Buy-Outs:" and following buy-out content
+    const buyoutSectionRegex = /<w:p[^>]*>[\s\S]*?9\.1\*\*\*\*[\s\S]*?Buy-Outs:[\s\S]*?<\/w:p>/
+    content = content.replace(buyoutSectionRegex, '')
+
+    // Remove Team Buy-out paragraph
+    const teamBuyoutRegex = /<w:p[^>]*>[\s\S]*?Team Buy-out:[\s\S]*?<\/w:p>/
+    content = content.replace(teamBuyoutRegex, '')
+
+    // Remove Player Buy-out paragraph
+    const playerBuyoutRegex = /<w:p[^>]*>[\s\S]*?Player Buy-Out:[\s\S]*?<\/w:p>/
+    content = content.replace(playerBuyoutRegex, '')
+  } else {
+    // If only one is selected, remove the other
+    if (!formData.hasTeamBuyout) {
+      // Remove Team Buy-out paragraph
+      const teamBuyoutRegex = /<w:p[^>]*>[\s\S]*?Team Buy-out:[\s\S]*?<\/w:p>/
+      content = content.replace(teamBuyoutRegex, '')
+    }
+
+    if (!formData.hasPlayerBuyout) {
+      // Remove Player Buy-out paragraph
+      const playerBuyoutRegex = /<w:p[^>]*>[\s\S]*?Player Buy-Out:[\s\S]*?<\/w:p>/
+      content = content.replace(playerBuyoutRegex, '')
+    }
   }
 
   zip.file('word/document.xml', content)
