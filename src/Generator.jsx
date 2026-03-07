@@ -38,7 +38,7 @@ function Generator({ onNavigate, editingContract, editingInvoice }) {
         agencyFee: {
           totalAmount: '',
           numberOfPayments: '1',
-          payments: [{ date: '', amount: '' }]
+          payments: [{ date: '', amount: '', invoiceNumber: '' }]
         }
       }
     ],
@@ -95,7 +95,7 @@ function Generator({ onNavigate, editingContract, editingInvoice }) {
             agencyFee: {
               totalAmount: '',
               numberOfPayments: '1',
-              payments: [{ date: '', amount: '' }]
+              payments: [{ date: '', amount: '', invoiceNumber: '' }]
             }
           });
         }
@@ -159,7 +159,7 @@ function Generator({ onNavigate, editingContract, editingInvoice }) {
         if (existingPayments[i]) {
           newPayments.push(existingPayments[i]);
         } else {
-          newPayments.push({ date: '', amount: '' });
+          newPayments.push({ date: '', amount: '', invoiceNumber: '' });
         }
       }
 
@@ -652,6 +652,15 @@ function Generator({ onNavigate, editingContract, editingInvoice }) {
                               value={payment.amount}
                               onChange={(e) => handleAgencyFeePaymentChange(seasonIndex, paymentIndex, 'amount', e.target.value)}
                               placeholder="e.g., 5,850"
+                            />
+                          </div>
+                          <div className="form-group">
+                            <label>Invoice Number</label>
+                            <input
+                              type="text"
+                              value={payment.invoiceNumber || ''}
+                              onChange={(e) => handleAgencyFeePaymentChange(seasonIndex, paymentIndex, 'invoiceNumber', e.target.value)}
+                              placeholder="e.g., 001"
                             />
                           </div>
                         </div>

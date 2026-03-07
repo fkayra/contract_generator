@@ -273,7 +273,13 @@ export const generateContract = async (formData) => {
     }
   }
 
-  if (formData.bonuses && formData.bonuses.length > 0) {
+  // Check if there are any valid bonuses
+  const hasValidBonuses = formData.bonuses && formData.bonuses.length > 0 &&
+    formData.bonuses.some(bonus =>
+      bonus.competitionName && bonus.achievements.some(a => a.description && a.amount)
+    )
+
+  if (hasValidBonuses) {
     let bonusXML = ''
 
     formData.bonuses.forEach((bonus, index) => {
@@ -299,6 +305,15 @@ export const generateContract = async (formData) => {
     // Match only the specific paragraph with paraId="0000004D" that contains [COMPETITION]
     const competitionRegex = /<w:p\s+[^>]*w14:paraId="0000004D"[^>]*>[\s\S]*?<\/w:p>/g
     content = content.replace(competitionRegex, bonusXML)
+  } else {
+    // Remove the entire bonus section if no bonuses are provided
+    // Remove the paragraph with [COMPETITION]
+    const competitionRegex = /<w:p\s+[^>]*w14:paraId="0000004D"[^>]*>[\s\S]*?<\/w:p>/g
+    content = content.replace(competitionRegex, '')
+
+    // Also remove the "[AMOUNT OF THAT MONTH] net of any Turkish taxes" paragraph if it exists
+    const amountRegex = /<w:p[^>]*>[\s\S]*?\[AMOUNT OF THAT MONTH\] net of any[^<]*taxes[\s\S]*?<\/w:p>/g
+    content = content.replace(amountRegex, '')
   }
 
   // Handle Buy-out section based on checkboxes

@@ -101,7 +101,7 @@ export const generateInvoice = async (invoice, index, downloadFormat = 'doc') =>
   </table>
 
   <div style="font-size: 11pt; font-weight: bold; margin: 10px 0; text-align: center;">
-    Invoice ${String(index + 1).padStart(3, '0')}
+    Invoice ${invoice.invoiceNumber || String(index + 1).padStart(3, '0')}
   </div>
 
   <table style="width: 85%; border-collapse: collapse; margin: 10px 0; border: 1px solid #000;">
