@@ -54,6 +54,9 @@ function ContractPreview({ formData }) {
       '\\[SEASON\\]': data.season,
       '\\[SEASON 1\\]': data.season1,
       '\\[SEASON 2\\]': data.season2,
+      '\\{SEASON_1\\}': data.season1 || (data.seasons && data.seasons[0] ? data.seasons[0].seasonName : null),
+      '\\{SEASON_2\\}': data.season2 || (data.seasons && data.seasons[1] ? data.seasons[1].seasonName : null),
+      '\\{MULTI_SEASON_CLAUSE_FULL\\}': data.multiSeasonClauseFull,
       '\\[CURRENCY\\]': data.currency,
       '\\[NUMBER OF SEASON\\]': data.numberOfSeasons,
       '\\[ADDITIONAL SEASON\\]': data.additionalSeason,
@@ -78,13 +81,19 @@ function ContractPreview({ formData }) {
 
     for (const [pattern, value] of Object.entries(replacements)) {
       const regex = new RegExp(pattern, 'gi');
-      const placeholder = pattern.replace(/\\\[/g, '[').replace(/\\\]/g, ']').replace(/\\s\*/g, '');
+      const placeholder = pattern
+        .replace(/\\\[/g, '[').replace(/\\\]/g, ']')
+        .replace(/\\\{/g, '{').replace(/\\\}/g, '}')
+        .replace(/\\s\*/g, '');
       result = result.replace(regex,
         value ? `<mark class="filled">${value}</mark>` : `<mark class="empty">${placeholder}</mark>`);
     }
 
     if (data.seasons && data.seasons[0]) {
       const season1 = data.seasons[0];
+
+      result = result.replace(/2025\/26 season/gi,
+        season1.seasonName ? `<mark class="filled">${season1.seasonName}</mark> season` : '2025/26 season');
 
       result = result.replace(/\[SEASON NAME\]/gi,
         season1.seasonName ? `<mark class="filled">${season1.seasonName}</mark>` : '<mark class="empty">[SEASON NAME]</mark>');
@@ -199,8 +208,13 @@ function ContractPreview({ formData }) {
       });
     }
 
-    const notFilledRegex = /\[[^\]]+\]/g;
-    result = result.replace(notFilledRegex, (match) => {
+    const bracketPlaceholders = /\[[^\]]+\]/g;
+    result = result.replace(bracketPlaceholders, (match) => {
+      return `<mark class="empty">${match}</mark>`;
+    });
+
+    const curlyPlaceholders = /\{[^\}]+\}/g;
+    result = result.replace(curlyPlaceholders, (match) => {
       return `<mark class="empty">${match}</mark>`;
     });
 
