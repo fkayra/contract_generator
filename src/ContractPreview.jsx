@@ -106,34 +106,34 @@ function ContractPreview({ formData }) {
 
       const numPayments = parseInt(season1.numberOfPayments) || 10;
 
-      for (let idx = 0; idx < 10; idx++) {
-        const monthNum = idx + 1;
-        const ordinalSuffix = monthNum === 1 ? 'ST' : monthNum === 2 ? 'ND' : monthNum === 3 ? 'RD' : 'TH';
-        const payment = season1.payments[idx];
-
-        if (idx < numPayments && payment) {
+      season1.payments.forEach((payment, idx) => {
+        if (idx < 10) {
+          const monthNum = idx + 1;
           const datePattern = new RegExp(`\\[DATE OF ${monthNum}.*?SALARY\\]`, 'gi');
-          result = result.replace(datePattern,
-            payment.date ? `<mark class="filled">${payment.date}</mark>` : `<mark class="empty">[DATE OF ${monthNum} SALARY]</mark>`);
 
-          result = result.replace(/\[AMOUNT OF THAT MONTH\]/i, (match) => {
-            if (payment.amount) {
-              return `<mark class="filled">${payment.amount}</mark>`;
-            }
-            return `<mark class="empty">[AMOUNT OF THAT MONTH]</mark>`;
-          });
-        } else {
-          const patterns = [
-            new RegExp(`<p[^>]*>.*?DATE OF ${monthNum}<sup>${ordinalSuffix}</sup> SALARY.*?</p>`, 'gis'),
-            new RegExp(`<p[^>]*>DATE OF ${monthNum}<sup>${ordinalSuffix}</sup> SALARY.*?</p>`, 'gis'),
-            new RegExp(`DATE OF ${monthNum}<sup>${ordinalSuffix}</sup> SALARY:?[^<]*\\[AMOUNT OF THAT MONTH\\][^<]*`, 'gi'),
-            new RegExp(`\\[DATE OF ${monthNum}[^\\]]*SALARY\\][^<]*:[^<]*\\[AMOUNT OF THAT MONTH\\][^<]*`, 'gi'),
-          ];
-
-          patterns.forEach(pattern => {
-            result = result.replace(pattern, '');
-          });
+          if (idx < numPayments) {
+            result = result.replace(datePattern,
+              payment.date ? `<mark class="filled">${payment.date}</mark>` : `<mark class="empty">[DATE OF ${monthNum} SALARY]</mark>`);
+          } else {
+            result = result.replace(datePattern, `<span class="payment-hide-${monthNum}">[DATE OF ${monthNum} SALARY]</span>`);
+          }
         }
+      });
+
+      for (let i = 0; i < 10; i++) {
+        result = result.replace(/\[AMOUNT OF THAT MONTH\]/i, (match) => {
+          if (i < numPayments && i < season1.payments.length && season1.payments[i] && season1.payments[i].amount) {
+            return `<mark class="filled">${season1.payments[i].amount}</mark>`;
+          } else if (i >= numPayments) {
+            return `<span class="payment-hide-amount-${i + 1}">[AMOUNT OF THAT MONTH]</span>`;
+          }
+          return `<mark class="empty">[AMOUNT OF THAT MONTH]</mark>`;
+        });
+      }
+
+      for (let idx = numPayments + 1; idx <= 10; idx++) {
+        const hidePattern = new RegExp(`<p>.*?payment-hide-${idx}.*?</p>`, 'gis');
+        result = result.replace(hidePattern, '');
       }
 
       if (season1.agencyFee) {
