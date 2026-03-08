@@ -47,13 +47,6 @@ function ContractPreview({ formData }) {
   }, [formData]);
 
   const processXmlContent = (content, data) => {
-    const getOrdinalSuffix = (num) => {
-      if (num === 1) return 'ST';
-      if (num === 2) return 'ND';
-      if (num === 3) return 'RD';
-      return 'TH';
-    };
-
     if (data.seasons && data.seasons.length > 0) {
       const firstSeason = data.seasons[0];
       const paymentParaIds = [
@@ -67,35 +60,6 @@ function ContractPreview({ formData }) {
       ];
 
       const numPayments = parseInt(firstSeason.numberOfPayments) || firstSeason.payments.length;
-
-      for (let i = 0; i < numPayments && i < firstSeason.payments.length; i++) {
-        const payment = firstSeason.payments[i];
-        const installmentNum = i + 1;
-        const suffix = getOrdinalSuffix(installmentNum);
-        const paraId = paymentParaIds[i];
-
-        const paraRegex = new RegExp(`<w:p[^>]*w14:paraId="${paraId}"[^>]*>.*?</w:p>`, 's');
-        const paraMatch = content.match(paraRegex);
-
-        if (paraMatch) {
-          let para = paraMatch[0];
-
-          if (installmentNum === 1) {
-            para = para.replace(/\[DATE OF 1<\/w:t>/, `${payment.date || ''}</w:t>`);
-            para = para.replace(/<w:t xml:space="preserve">ST<\/w:t>/, '<w:t></w:t>');
-            para = para.replace(/<w:t xml:space="preserve"> SALARY\]/, '<w:t xml:space="preserve">');
-          } else {
-            para = para.replace(new RegExp(`DATE OF ${installmentNum}<\\/w:t>`), `${payment.date || ''}</w:t>`);
-            para = para.replace(new RegExp(`<w:t xml:space="preserve">${suffix}<\\/w:t>`), '<w:t></w:t>');
-            para = para.replace(/<w:t xml:space="preserve"> SALARY/, '<w:t xml:space="preserve">');
-          }
-
-          para = para.replace(/\[AMOUNT OF THAT MONTH\]/g, payment.amount || '');
-          para = para.replace(/\[COUNNAME OF THE COUNTRY\]/g, data.countryName || '');
-
-          content = content.replace(paraRegex, para);
-        }
-      }
 
       for (let i = numPayments; i < 10; i++) {
         const paraId = paymentParaIds[i];
