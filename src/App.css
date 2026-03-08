@@ -22,6 +22,9 @@
   position: sticky;
   top: 2rem;
   max-height: calc(100vh - 4rem);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .container {
