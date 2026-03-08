@@ -55,12 +55,10 @@ export const generateContract = async (formData) => {
   console.log('Has Team Buyout:', formData.hasTeamBuyout)
   console.log('Has Player Buyout:', formData.hasPlayerBuyout)
 
-  // If neither buyout is selected, remove the entire section 9
+  // If neither buyout is selected, keep section 9 header but remove content
   if (!formData.hasTeamBuyout && !formData.hasPlayerBuyout) {
-    console.log('No buyout clauses selected - removing section 9')
-    // Remove section 9 header (paraId 00000077)
-    const section9HeaderRegex = /<w:p[^>]*w14:paraId="00000077"[^>]*>.*?<\/w:p>/s
-    content = content.replace(section9HeaderRegex, '')
+    console.log('No buyout clauses selected - keeping section 9 header only')
+    // Keep section 9 header (paraId 00000077) - DO NOT REMOVE
 
     // Remove empty paragraph after header (paraId 00000078)
     const emptyPara1Regex = /<w:p[^>]*w14:paraId="00000078"[^>]*>.*?<\/w:p>/s
