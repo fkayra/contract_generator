@@ -200,8 +200,7 @@ function InvoiceForm({ formData, onBack, onNavigate, editingInvoice }) {
             playerName: season.playerName || '',
             currency: invoiceData.currency === 'EURO' ? 'Euro' : 'USD',
             currencySymbol: invoiceData.currency === 'EURO' ? '€' : '$',
-            includeVAT: invoiceData.includeVAT,
-            invoiceNumber: payment.invoiceNumber || ''
+            includeVAT: invoiceData.includeVAT
           }
 
           generatedInvoices.push(invoice)
@@ -491,7 +490,6 @@ function InvoiceForm({ formData, onBack, onNavigate, editingInvoice }) {
                         <p><strong>Payment {paymentIndex + 1}</strong></p>
                         <p>Date: {payment.date}</p>
                         <p>Amount: {payment.amount}</p>
-                        <p>Invoice Number: {payment.invoiceNumber || 'Not specified'}</p>
                       </div>
                     )
                   ))}
