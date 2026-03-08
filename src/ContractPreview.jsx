@@ -132,7 +132,7 @@ function ContractPreview({ formData }) {
       }
 
       for (let idx = numPayments + 1; idx <= 10; idx++) {
-        const hidePattern = new RegExp(`<p>.*?payment-hide-${idx}.*?</p>`, 'gis');
+        const hidePattern = new RegExp(`<p[^>]*>[^<]*payment-hide-${idx}[^<]*</p>`, 'gi');
         result = result.replace(hidePattern, '');
       }
 
