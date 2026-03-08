@@ -85,6 +85,13 @@ function ContractPreview({ formData }) {
 
     if (data.seasons && data.seasons[0]) {
       const season1 = data.seasons[0];
+
+      result = result.replace(/\[SEASON NAME\]/gi,
+        season1.seasonName ? `<mark class="filled">${season1.seasonName}</mark>` : '<mark class="empty">[SEASON NAME]</mark>');
+
+      result = result.replace(/\[NUMBER OF PAYMENTS\]/gi,
+        season1.numberOfPayments ? `<mark class="filled">${season1.numberOfPayments}</mark>` : '<mark class="empty">[NUMBER OF PAYMENTS]</mark>');
+
       result = result.replace(/\[TOTAL AMOUNT OF CONTRACY\]/gi,
         season1.totalSalary ? `<mark class="filled">${season1.totalSalary}</mark>` : '<mark class="empty">[TOTAL AMOUNT OF CONTRACY]</mark>');
 
@@ -108,6 +115,9 @@ function ContractPreview({ formData }) {
         result = result.replace(/\[AGENCY FEE TOTAL\]/gi,
           season1.agencyFee.totalAmount ? `<mark class="filled">${season1.agencyFee.totalAmount}</mark>` : '<mark class="empty">[AGENCY FEE TOTAL]</mark>');
 
+        result = result.replace(/\[AGENCY FEE NUMBER OF PAYMENTS\]/gi,
+          season1.agencyFee.numberOfPayments ? `<mark class="filled">${season1.agencyFee.numberOfPayments}</mark>` : '<mark class="empty">[AGENCY FEE NUMBER OF PAYMENTS]</mark>');
+
         season1.agencyFee.payments.forEach((payment, idx) => {
           const feeNum = idx + 1;
           const datePattern = new RegExp(`\\[AGENCY FEE ${feeNum} DATE\\]`, 'gi');
@@ -123,6 +133,13 @@ function ContractPreview({ formData }) {
 
     if (data.seasons && data.seasons[1]) {
       const season2 = data.seasons[1];
+
+      result = result.replace(/\[SEASON 2 NAME\]/gi,
+        season2.seasonName ? `<mark class="filled">${season2.seasonName}</mark>` : '<mark class="empty">[SEASON 2 NAME]</mark>');
+
+      result = result.replace(/\[SEASON 2 NUMBER OF PAYMENTS\]/gi,
+        season2.numberOfPayments ? `<mark class="filled">${season2.numberOfPayments}</mark>` : '<mark class="empty">[SEASON 2 NUMBER OF PAYMENTS]</mark>');
+
       result = result.replace(/\[SEASON 2 TOTAL AMOUNT\]/gi,
         season2.totalSalary ? `<mark class="filled">${season2.totalSalary}</mark>` : '<mark class="empty">[SEASON 2 TOTAL AMOUNT]</mark>');
 
@@ -140,6 +157,9 @@ function ContractPreview({ formData }) {
       if (season2.agencyFee) {
         result = result.replace(/\[SEASON 2 AGENCY FEE TOTAL\]/gi,
           season2.agencyFee.totalAmount ? `<mark class="filled">${season2.agencyFee.totalAmount}</mark>` : '<mark class="empty">[SEASON 2 AGENCY FEE TOTAL]</mark>');
+
+        result = result.replace(/\[SEASON 2 AGENCY FEE NUMBER OF PAYMENTS\]/gi,
+          season2.agencyFee.numberOfPayments ? `<mark class="filled">${season2.agencyFee.numberOfPayments}</mark>` : '<mark class="empty">[SEASON 2 AGENCY FEE NUMBER OF PAYMENTS]</mark>');
 
         season2.agencyFee.payments.forEach((payment, idx) => {
           const feeNum = idx + 1;
