@@ -4,6 +4,26 @@
   padding: 2rem 1rem;
 }
 
+.app.split-layout {
+  display: flex;
+  gap: 2rem;
+  padding: 2rem;
+  align-items: flex-start;
+}
+
+.form-panel {
+  flex: 1;
+  max-width: 60%;
+  overflow-y: auto;
+}
+
+.preview-panel {
+  flex: 0 0 400px;
+  position: sticky;
+  top: 2rem;
+  max-height: calc(100vh - 4rem);
+}
+
 .container {
   max-width: 1000px;
   margin: 0 auto;
@@ -461,7 +481,34 @@ header p {
   border: 2px solid #6ee7b7;
 }
 
+@media (max-width: 1200px) {
+  .app.split-layout {
+    flex-direction: column;
+  }
+
+  .form-panel {
+    max-width: 100%;
+  }
+
+  .preview-panel {
+    flex: 1 1 auto;
+    position: relative;
+    top: 0;
+    max-height: 600px;
+    width: 100%;
+  }
+}
+
 @media (max-width: 768px) {
+  .app.split-layout {
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .preview-panel {
+    max-height: 500px;
+  }
+
   .container {
     padding: 2rem 1.5rem;
   }

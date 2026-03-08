@@ -3,6 +3,7 @@ import './App.css';
 import { generateContract } from './contractGenerator';
 import InvoiceForm from './InvoiceForm';
 import { supabase } from './supabaseClient';
+import ContractPreview from './ContractPreview';
 
 function Generator({ onNavigate, editingContract, editingInvoice }) {
   const [showInvoice, setShowInvoice] = useState(editingInvoice ? true : false);
@@ -296,9 +297,10 @@ function Generator({ onNavigate, editingContract, editingInvoice }) {
   }
 
   return (
-    <div className="app">
-      <div className="container">
-        <header>
+    <div className="app split-layout">
+      <div className="form-panel">
+        <div className="container">
+          <header>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
             <h1>Basketball Contract Generator</h1>
             <button
@@ -960,6 +962,11 @@ function Generator({ onNavigate, editingContract, editingInvoice }) {
             {loading ? 'Generating...' : 'Generate Contract'}
           </button>
         </form>
+        </div>
+      </div>
+
+      <div className="preview-panel">
+        <ContractPreview formData={formData} />
       </div>
     </div>
   );
