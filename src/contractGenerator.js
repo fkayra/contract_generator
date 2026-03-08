@@ -33,6 +33,7 @@ export const generateContract = async (formData) => {
   content = content.replace(/\[TEAM BUY OUT AMOUNT\]/g, formData.teamBuyoutAmount || '')
   content = content.replace(/\[PLAYER BUY OUT AMOUNT\]/g, formData.playerBuyoutAmount || '')
   content = content.replace(/\[DATE OF THE BUY OUT\]/g, formData.buyoutDate || '')
+  content = content.replace(/\[NUMBER OF DAYS\]/g, formData.numberOfDays || '')
   content = content.replace(/\[NAME OF THE AGENT\]/g, formData.agentName || '')
   content = content.replace(/\[NUMBER OF THE AGENT\]/g, formData.agentName || '')
   content = content.replace(/\[AND NAME OF THE OTHER AGENT\]/g, formData.otherAgentName || '')
@@ -48,6 +49,74 @@ export const generateContract = async (formData) => {
   // [COMPETITION] will be replaced later with bonus XML
   content = content.replace(/\[NOT\]/g, formData.includeNotClause ? 'NOT' : '')
   // [ADDITIONAL_SEASON] will be replaced later with second season XML
+
+  // Handle buyout clauses based on checkboxes
+  console.log('=== BUYOUT CLAUSE HANDLING ===')
+  console.log('Has Team Buyout:', formData.hasTeamBuyout)
+  console.log('Has Player Buyout:', formData.hasPlayerBuyout)
+
+  // If neither buyout is selected, remove the entire section 9
+  if (!formData.hasTeamBuyout && !formData.hasPlayerBuyout) {
+    console.log('No buyout clauses selected - removing section 9')
+    // Remove section 9 header (paraId 00000077)
+    const section9HeaderRegex = /<w:p[^>]*w14:paraId="00000077"[^>]*>.*?<\/w:p>/s
+    content = content.replace(section9HeaderRegex, '')
+
+    // Remove empty paragraph after header (paraId 00000078)
+    const emptyPara1Regex = /<w:p[^>]*w14:paraId="00000078"[^>]*>.*?<\/w:p>/s
+    content = content.replace(emptyPara1Regex, '')
+
+    // Remove buyout subheader (paraId 00000079)
+    const subheaderRegex = /<w:p[^>]*w14:paraId="00000079"[^>]*>.*?<\/w:p>/s
+    content = content.replace(subheaderRegex, '')
+
+    // Remove team buyout paragraph (paraId 0000007A)
+    const teamBuyoutRegex = /<w:p[^>]*w14:paraId="0000007A"[^>]*>.*?<\/w:p>/s
+    content = content.replace(teamBuyoutRegex, '')
+
+    // Remove empty paragraph (paraId 0000007B)
+    const emptyPara2Regex = /<w:p[^>]*w14:paraId="0000007B"[^>]*>.*?<\/w:p>/s
+    content = content.replace(emptyPara2Regex, '')
+
+    // Remove player buyout paragraph (paraId 0000007C)
+    const playerBuyoutRegex = /<w:p[^>]*w14:paraId="0000007C"[^>]*>.*?<\/w:p>/s
+    content = content.replace(playerBuyoutRegex, '')
+
+    // Remove final empty paragraph (paraId 0000007D)
+    const emptyPara3Regex = /<w:p[^>]*w14:paraId="0000007D"[^>]*>.*?<\/w:p>/s
+    content = content.replace(emptyPara3Regex, '')
+  } else {
+    // If only player buyout is selected, remove team buyout
+    if (!formData.hasTeamBuyout && formData.hasPlayerBuyout) {
+      console.log('Only player buyout selected - removing team buyout')
+      const teamBuyoutRegex = /<w:p[^>]*w14:paraId="0000007A"[^>]*>.*?<\/w:p>/s
+      content = content.replace(teamBuyoutRegex, '')
+
+      // Also remove the empty paragraph after team buyout
+      const emptyPara2Regex = /<w:p[^>]*w14:paraId="0000007B"[^>]*>.*?<\/w:p>/s
+      content = content.replace(emptyPara2Regex, '')
+    }
+
+    // If only team buyout is selected, remove player buyout
+    if (formData.hasTeamBuyout && !formData.hasPlayerBuyout) {
+      console.log('Only team buyout selected - removing player buyout')
+      const playerBuyoutRegex = /<w:p[^>]*w14:paraId="0000007C"[^>]*>.*?<\/w:p>/s
+      content = content.replace(playerBuyoutRegex, '')
+
+      // Also remove the empty paragraph after player buyout
+      const emptyPara3Regex = /<w:p[^>]*w14:paraId="0000007D"[^>]*>.*?<\/w:p>/s
+      content = content.replace(emptyPara3Regex, '')
+
+      // Remove the preceding empty paragraph (0000007B) as well
+      const emptyPara2Regex = /<w:p[^>]*w14:paraId="0000007B"[^>]*>.*?<\/w:p>/s
+      content = content.replace(emptyPara2Regex, '')
+    }
+
+    // If both are selected, keep everything (no removal needed)
+    if (formData.hasTeamBuyout && formData.hasPlayerBuyout) {
+      console.log('Both buyout clauses selected - keeping all')
+    }
+  }
 
   // Handle multi-season clause
   const isMultiSeason = formData.numberOfSeasons === '2'

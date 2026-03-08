@@ -42,9 +42,12 @@ function Generator({ onNavigate, editingContract, editingInvoice }) {
         }
       }
     ],
+    hasTeamBuyout: false,
     teamBuyoutAmount: '',
+    hasPlayerBuyout: false,
     playerBuyoutAmount: '',
     buyoutDate: '',
+    numberOfDays: '',
     agentName: '',
     otherAgentName: '',
     emailAddress: '',
@@ -55,7 +58,6 @@ function Generator({ onNavigate, editingContract, editingInvoice }) {
     ticketClass: '',
     numberOfTickets: '',
     numberOfBedrooms: '',
-    numberOfDays: '',
     includeNotClause: false,
     bonuses: [
       {
@@ -662,38 +664,82 @@ function Generator({ onNavigate, editingContract, editingInvoice }) {
 
           <section className="form-section">
             <h2>Buyout Clauses</h2>
-            <div className="form-grid">
-              <div className="form-group">
-                <label>Team Buyout Amount</label>
+
+            <div className="form-group" style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
                 <input
-                  type="text"
-                  name="teamBuyoutAmount"
-                  value={formData.teamBuyoutAmount}
+                  type="checkbox"
+                  name="hasTeamBuyout"
+                  checked={formData.hasTeamBuyout}
                   onChange={handleInputChange}
-                  placeholder="e.g., 50,000.00"
+                  style={{ marginRight: '10px', width: 'auto' }}
                 />
-              </div>
-              <div className="form-group">
-                <label>Player Buyout Amount</label>
-                <input
-                  type="text"
-                  name="playerBuyoutAmount"
-                  value={formData.playerBuyoutAmount}
-                  onChange={handleInputChange}
-                  placeholder="e.g., 25,000.00"
-                />
-              </div>
-              <div className="form-group">
-                <label>Buyout Date</label>
-                <input
-                  type="text"
-                  name="buyoutDate"
-                  value={formData.buyoutDate}
-                  onChange={handleInputChange}
-                  placeholder="e.g., June 30, 2026"
-                />
-              </div>
+                <span>Include Team Buy-out Clause</span>
+              </label>
             </div>
+
+            {formData.hasTeamBuyout && (
+              <div className="form-grid" style={{ marginBottom: '30px', paddingLeft: '20px', borderLeft: '3px solid #007bff' }}>
+                <div className="form-group">
+                  <label>Team Buyout Amount</label>
+                  <input
+                    type="text"
+                    name="teamBuyoutAmount"
+                    value={formData.teamBuyoutAmount}
+                    onChange={handleInputChange}
+                    placeholder="e.g., 50,000.00"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Number of Days After Last Game</label>
+                  <input
+                    type="text"
+                    name="numberOfDays"
+                    value={formData.numberOfDays}
+                    onChange={handleInputChange}
+                    placeholder="e.g., 7"
+                  />
+                </div>
+              </div>
+            )}
+
+            <div className="form-group" style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                <input
+                  type="checkbox"
+                  name="hasPlayerBuyout"
+                  checked={formData.hasPlayerBuyout}
+                  onChange={handleInputChange}
+                  style={{ marginRight: '10px', width: 'auto' }}
+                />
+                <span>Include Player Buy-out Clause</span>
+              </label>
+            </div>
+
+            {formData.hasPlayerBuyout && (
+              <div className="form-grid" style={{ paddingLeft: '20px', borderLeft: '3px solid #28a745' }}>
+                <div className="form-group">
+                  <label>Player Buyout Amount</label>
+                  <input
+                    type="text"
+                    name="playerBuyoutAmount"
+                    value={formData.playerBuyoutAmount}
+                    onChange={handleInputChange}
+                    placeholder="e.g., 25,000.00"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Buyout Date (Deadline)</label>
+                  <input
+                    type="text"
+                    name="buyoutDate"
+                    value={formData.buyoutDate}
+                    onChange={handleInputChange}
+                    placeholder="e.g., June 30, 2026"
+                  />
+                </div>
+              </div>
+            )}
           </section>
 
           <section className="form-section">
