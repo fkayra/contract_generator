@@ -98,7 +98,11 @@ function InvoiceForm({ formData, onBack, onNavigate, editingInvoice }) {
 
   const handleCurrencySelect = (currency) => {
     setInvoiceData({ ...invoiceData, currency })
-    setStep(4)
+    if (editingInvoice && invoices.length > 0) {
+      setStep(6)
+    } else {
+      setStep(4)
+    }
   }
 
   const handleVATChange = (value) => {
@@ -162,18 +166,14 @@ function InvoiceForm({ formData, onBack, onNavigate, editingInvoice }) {
     return bankAccounts[key]
   }
 
-  const generateInvoiceData = () => {
+  const generateInvoiceData = (navigateToStep6 = true) => {
     const generatedInvoices = []
 
     formData.seasons.forEach((season) => {
       season.agencyFee.payments.forEach((payment) => {
         if (payment.date && payment.amount) {
-          // Parse number: remove all non-numeric except dots and commas
-          // Then remove dots (thousand separator), replace comma with dot (decimal separator)
           let numStr = payment.amount.toString().trim()
-          // Remove currency symbols and spaces
           numStr = numStr.replace(/[€$\s]/g, '')
-          // Remove dots (thousand separator), replace comma with dot (decimal separator)
           numStr = numStr.replace(/\./g, '').replace(',', '.')
           const amount = parseFloat(numStr) || 0
           let baseAmount = amount
@@ -209,7 +209,9 @@ function InvoiceForm({ formData, onBack, onNavigate, editingInvoice }) {
     })
 
     setInvoices(generatedInvoices)
-    setStep(6)
+    if (navigateToStep6) {
+      setStep(6)
+    }
   }
 
   const saveToDatabase = async () => {
@@ -513,9 +515,57 @@ function InvoiceForm({ formData, onBack, onNavigate, editingInvoice }) {
         <div>
           <h1>Invoice Preview ({invoices.length})</h1>
 
+          <section className="form-section" style={{ marginBottom: '20px' }}>
+            <h2>Invoice Settings</h2>
+            <div className="form-grid">
+              <div className="form-group">
+                <label>Invoice Number</label>
+                <input
+                  type="text"
+                  value={invoiceData.invoiceNumber}
+                  onChange={(e) => setInvoiceData({ ...invoiceData, invoiceNumber: e.target.value })}
+                  placeholder="e.g., 001, 002, etc."
+                />
+              </div>
+              <div className="form-group">
+                <label>Company</label>
+                <p style={{ padding: '10px', backgroundColor: '#f5f5f5', borderRadius: '4px', margin: 0 }}>{invoiceData.company}</p>
+              </div>
+              <div className="form-group">
+                <label>Bank</label>
+                <p style={{ padding: '10px', backgroundColor: '#f5f5f5', borderRadius: '4px', margin: 0 }}>{invoiceData.bank}</p>
+              </div>
+              <div className="form-group">
+                <label>Currency</label>
+                <p style={{ padding: '10px', backgroundColor: '#f5f5f5', borderRadius: '4px', margin: 0 }}>{invoiceData.currency}</p>
+              </div>
+              <div className="form-group">
+                <label>VAT</label>
+                <p style={{ padding: '10px', backgroundColor: '#f5f5f5', borderRadius: '4px', margin: 0 }}>{invoiceData.includeVAT === 'yes' ? 'Yes (19%)' : 'No (0%)'}</p>
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+              <button
+                onClick={() => setStep(1)}
+                style={{ padding: '10px 20px', fontSize: '14px' }}
+              >
+                Change All Settings
+              </button>
+              <button
+                onClick={() => generateInvoiceData(false)}
+                style={{ padding: '10px 20px', fontSize: '14px', backgroundColor: '#4CAF50', color: 'white' }}
+              >
+                Apply Changes & Regenerate
+              </button>
+            </div>
+          </section>
+
           {invoices.map((invoice, index) => (
             <div key={index} style={{ border: '2px solid #333', padding: '20px', marginBottom: '20px', backgroundColor: '#f9f9f9' }}>
               <h2>Invoice {index + 1}</h2>
+              <p style={{ fontSize: '16px', fontWeight: 'bold', marginTop: '10px' }}>
+                Invoice Number: {invoiceData.invoiceNumber || 'Not Set'}
+              </p>
 
               <div style={{ marginBottom: '15px' }}>
                 <h3>{invoice.company.name}</h3>
