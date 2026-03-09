@@ -166,15 +166,38 @@ function InvoiceForm({ formData, onBack, onNavigate, editingInvoice }) {
     return bankAccounts[key]
   }
 
+  const generateInvoiceNumber = (baseNumber, index) => {
+    if (!baseNumber) return String(index + 1).padStart(3, '0')
+
+    const numMatch = baseNumber.match(/\d+/)
+    if (numMatch) {
+      const baseNum = parseInt(numMatch[0])
+      const prefix = baseNumber.substring(0, numMatch.index)
+      const suffix = baseNumber.substring(numMatch.index + numMatch[0].length)
+      const newNum = (baseNum + index).toString().padStart(numMatch[0].length, '0')
+      return prefix + newNum + suffix
+    }
+    return baseNumber
+  }
+
   const generateInvoiceData = (navigateToStep6 = true) => {
     const generatedInvoices = []
+    let invoiceCounter = 0
 
     formData.seasons.forEach((season) => {
       season.agencyFee.payments.forEach((payment) => {
         if (payment.date && payment.amount) {
           let numStr = payment.amount.toString().trim()
           numStr = numStr.replace(/[€$\s]/g, '')
-          numStr = numStr.replace(/\./g, '').replace(',', '.')
+
+          const decimalMatch = numStr.match(/[.,](\d{1,2})$/)
+          if (decimalMatch) {
+            const decimalPart = decimalMatch[1]
+            numStr = numStr.substring(0, numStr.length - decimalMatch[0].length)
+            numStr = numStr.replace(/[.,]/g, '') + '.' + decimalPart
+          } else {
+            numStr = numStr.replace(/[.,]/g, '')
+          }
           const amount = parseFloat(numStr) || 0
           let baseAmount = amount
           let vatAmount = 0
@@ -184,6 +207,9 @@ function InvoiceForm({ formData, onBack, onNavigate, editingInvoice }) {
             vatAmount = amount * 0.19
             totalAmount = amount + vatAmount
           }
+
+          const existingInvoice = invoices[invoiceCounter]
+          const generatedNumber = generateInvoiceNumber(invoiceData.invoiceNumber, invoiceCounter)
 
           const invoice = {
             date: payment.date,
@@ -200,10 +226,12 @@ function InvoiceForm({ formData, onBack, onNavigate, editingInvoice }) {
             playerName: season.playerName || '',
             currency: invoiceData.currency === 'EURO' ? 'Euro' : 'USD',
             currencySymbol: invoiceData.currency === 'EURO' ? '€' : '$',
-            includeVAT: invoiceData.includeVAT
+            includeVAT: invoiceData.includeVAT,
+            invoiceNumber: existingInvoice?.invoiceNumber || generatedNumber
           }
 
           generatedInvoices.push(invoice)
+          invoiceCounter++
         }
       })
     })
@@ -219,9 +247,11 @@ function InvoiceForm({ formData, onBack, onNavigate, editingInvoice }) {
       const invoiceId = editingInvoice?.id;
       const firstInvoice = invoices[0];
 
+      const invoiceNumbers = invoices.map(inv => inv.invoiceNumber).filter(Boolean).join(', ') || `INV-${Date.now()}`
+
       const dataToSave = {
         client_name: firstInvoice.clubName,
-        invoice_number: invoiceData.invoiceNumber || `INV-${Date.now()}`,
+        invoice_number: invoiceNumbers,
         invoice_data: {
           invoiceSettings: invoiceData,
           invoices: invoices,
@@ -376,13 +406,16 @@ function InvoiceForm({ formData, onBack, onNavigate, editingInvoice }) {
             <h2>Invoice Settings</h2>
             <div className="form-grid">
               <div className="form-group">
-                <label>Invoice Number</label>
+                <label>Starting Invoice Number (will auto-increment for multiple invoices)</label>
                 <input
                   type="text"
                   value={invoiceData.invoiceNumber}
                   onChange={(e) => setInvoiceData({ ...invoiceData, invoiceNumber: e.target.value })}
-                  placeholder="e.g., INV-2024-001"
+                  placeholder="e.g., 001, INV-001"
                 />
+                <small style={{ fontSize: '12px', color: '#666', display: 'block', marginTop: '5px' }}>
+                  For multiple invoices, system will generate: {invoiceData.invoiceNumber || '001'}, {invoiceData.invoiceNumber ? (parseInt(invoiceData.invoiceNumber) + 1).toString().padStart(3, '0') : '002'}, etc.
+                </small>
               </div>
               <div className="form-group">
                 <label>Include VAT (19%)</label>
@@ -516,17 +549,8 @@ function InvoiceForm({ formData, onBack, onNavigate, editingInvoice }) {
           <h1>Invoice Preview ({invoices.length})</h1>
 
           <section className="form-section" style={{ marginBottom: '20px' }}>
-            <h2>Invoice Settings</h2>
+            <h2>General Settings</h2>
             <div className="form-grid">
-              <div className="form-group">
-                <label>Invoice Number</label>
-                <input
-                  type="text"
-                  value={invoiceData.invoiceNumber}
-                  onChange={(e) => setInvoiceData({ ...invoiceData, invoiceNumber: e.target.value })}
-                  placeholder="e.g., 001, 002, etc."
-                />
-              </div>
               <div className="form-group">
                 <label>Company</label>
                 <p style={{ padding: '10px', backgroundColor: '#f5f5f5', borderRadius: '4px', margin: 0 }}>{invoiceData.company}</p>
@@ -563,9 +587,21 @@ function InvoiceForm({ formData, onBack, onNavigate, editingInvoice }) {
           {invoices.map((invoice, index) => (
             <div key={index} style={{ border: '2px solid #333', padding: '20px', marginBottom: '20px', backgroundColor: '#f9f9f9' }}>
               <h2>Invoice {index + 1}</h2>
-              <p style={{ fontSize: '16px', fontWeight: 'bold', marginTop: '10px' }}>
-                Invoice Number: {invoiceData.invoiceNumber || 'Not Set'}
-              </p>
+
+              <div className="form-group" style={{ marginTop: '15px', marginBottom: '15px' }}>
+                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Invoice Number</label>
+                <input
+                  type="text"
+                  value={invoice.invoiceNumber}
+                  onChange={(e) => {
+                    const updatedInvoices = [...invoices]
+                    updatedInvoices[index].invoiceNumber = e.target.value
+                    setInvoices(updatedInvoices)
+                  }}
+                  placeholder="e.g., 001, 002, INV-001"
+                  style={{ width: '200px', padding: '8px', fontSize: '14px', border: '1px solid #ccc', borderRadius: '4px' }}
+                />
+              </div>
 
               <div style={{ marginBottom: '15px' }}>
                 <h3>{invoice.company.name}</h3>

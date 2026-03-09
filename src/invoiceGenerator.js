@@ -101,7 +101,7 @@ export const generateInvoice = async (invoice, index, downloadFormat = 'doc') =>
   </table>
 
   <div style="font-size: 11pt; font-weight: bold; margin: 10px 0; text-align: center;">
-    Invoice ${String(index + 1).padStart(3, '0')}
+    Invoice ${invoice.invoiceNumber || String(index + 1).padStart(3, '0')}
   </div>
 
   <table style="width: 85%; border-collapse: collapse; margin: 10px 0; border: 1px solid #000;">
@@ -133,7 +133,8 @@ export const generateInvoice = async (invoice, index, downloadFormat = 'doc') =>
 </html>
   `
 
-  const baseFilename = `Invoice_${invoice.company.name.replace(/ /g, '_')}_${invoice.date.replace(/\//g, '-')}_${index + 1}`
+  const invoiceNum = invoice.invoiceNumber || String(index + 1).padStart(3, '0')
+  const baseFilename = `Invoice_${invoice.company.name.replace(/ /g, '_')}_${invoice.date.replace(/\//g, '-')}_${invoiceNum}`
 
   console.log('HTML content length:', htmlContent.length)
   console.log('First 500 chars of HTML:', htmlContent.substring(0, 500))
